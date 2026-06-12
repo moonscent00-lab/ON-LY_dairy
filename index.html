@@ -873,6 +873,7 @@ function openModal(id){
   document.getElementById('sync-status-wrap').style.display='none';
   document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('on'));
   buildRoutineEditor({});
+  calculateIntakeKcal();
   if(id){
     editingId=id;
     const e=entries.find(x=>x.id===id);
@@ -903,7 +904,7 @@ function openModal(id){
     if(e.lunch)document.getElementById('inp-lunch').value=e.lunch;
     if(e.dinner)document.getElementById('inp-dinner').value=e.dinner;
     if(e.snack)document.getElementById('inp-snack').value=e.snack;
-    document.getElementById('inp-intake-kcal').value=e.intakeKcal||'';
+    calculateIntakeKcal();
     document.getElementById('inp-burn-kcal').value=e.burnKcal||'';
     document.getElementById('inp-text').value=e.text||'';
     document.getElementById('inp-place').value=e.place||'';
