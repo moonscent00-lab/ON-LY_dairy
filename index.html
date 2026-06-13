@@ -266,7 +266,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   <div id="meal-tags-breakfast" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
     <div class="stat-box"><label>칼로리</label><input type="number" id="inp-breakfast-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()"></div>
-    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-breakfast-protein" placeholder="0" step="1"></div>
+    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-breakfast-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()"></div>
   </div>
 
   <!-- 점심 -->
@@ -279,7 +279,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   <div id="meal-tags-lunch" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
     <div class="stat-box"><label>칼로리</label><input type="number" id="inp-lunch-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()"></div>
-    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-lunch-protein" placeholder="0" step="1"></div>
+    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-lunch-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()"></div>
   </div>
 
   <!-- 저녁 -->
@@ -292,7 +292,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   <div id="meal-tags-dinner" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
     <div class="stat-box"><label>칼로리</label><input type="number" id="inp-dinner-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()"></div>
-    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-dinner-protein" placeholder="0" step="1"></div>
+    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-dinner-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()"></div>
   </div>
 
   <!-- 간식 -->
@@ -305,11 +305,12 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   <div id="meal-tags-snack" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
     <div class="stat-box"><label>칼로리</label><input type="number" id="inp-snack-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()"></div>
-    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-snack-protein" placeholder="0" step="1"></div>
+    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-snack-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()"></div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
     <div class="stat-box"><label>총 섭취 kcal</label><input type="number" id="inp-intake-kcal" placeholder="0" step="10" readonly style="background:var(--bg);"></div>
+    <div class="stat-box"><label>총 단백질 g</label><input type="number" id="inp-intake-protein" placeholder="0" step="1" readonly style="background:var(--bg);"></div>
     <div class="stat-box"><label>소모 kcal</label><input type="number" id="inp-burn-kcal" placeholder="0" step="10"></div>
   </div>
   <div class="field"><textarea id="inp-food" placeholder="기타 식단 메모 (선택사항)" style="min-height:50px;font-size:13px;"></textarea></div>
@@ -441,12 +442,13 @@ function getMealText(key){
 
 function calculateIntakeKcal(){
   const meals=['breakfast','lunch','dinner','snack'];
-  let total=0;
+  let totalKcal=0, totalProtein=0;
   meals.forEach(m=>{
-    const v=parseFloat(document.getElementById('inp-'+m+'-kcal').value)||0;
-    total+=v;
+    totalKcal+=parseFloat(document.getElementById('inp-'+m+'-kcal').value)||0;
+    totalProtein+=parseFloat(document.getElementById('inp-'+m+'-protein').value)||0;
   });
-  document.getElementById('inp-intake-kcal').value=total||'';
+  document.getElementById('inp-intake-kcal').value=totalKcal||'';
+  document.getElementById('inp-intake-protein').value=totalProtein||'';
 }
 
 function acHide(key){
@@ -953,6 +955,7 @@ function openModal(id){
       document.getElementById('inp-'+k+'-protein').value=e[k+'Protein']||'';
     });
     calculateIntakeKcal();
+    document.getElementById('inp-intake-protein').value=e.intakeProtein||'';
     document.getElementById('inp-burn-kcal').value=e.burnKcal||'';
     document.getElementById('inp-text').value=e.text||'';
     document.getElementById('inp-place').value=e.place||'';
@@ -995,6 +998,7 @@ function saveEntry(){
     snackKcal:document.getElementById('inp-snack-kcal').value,
     snackProtein:document.getElementById('inp-snack-protein').value,
     intakeKcal:document.getElementById('inp-intake-kcal').value,
+    intakeProtein:document.getElementById('inp-intake-protein').value,
     burnKcal:document.getElementById('inp-burn-kcal').value,
     food:document.getElementById('inp-food').value,
     text:document.getElementById('inp-text').value,
@@ -1116,7 +1120,7 @@ function entryHTML(e){
   const foodHtml=hasDiet?`<div style="padding:0 16px 10px;">
     <details>
       <summary style="font-size:12px;color:var(--text2);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg);border-radius:20px;width:fit-content;border:1px solid var(--border);">
-        🍱 <span style="font-weight:500;">식단 보기</span>
+        🍱 <span style="font-weight:500;">식단 보기</span>${e.intakeKcal?`<span style="color:var(--accent);font-weight:600;">${e.intakeKcal}kcal</span>`:''}${e.intakeProtein?`<span style="color:var(--purple);font-weight:600;">단백질 ${e.intakeProtein}g</span>`:''}
       </summary>
       <div style="margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:var(--r-sm);font-size:13px;color:var(--text);white-space:pre-wrap;line-height:2;">${dietLines}</div>
     </details>
