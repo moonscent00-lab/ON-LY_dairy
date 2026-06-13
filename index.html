@@ -448,6 +448,10 @@ function removeMealTag(key,idx){
   renderMealTags(key);
 }
 
+function getMealText(key){
+  return mealTags[key].join(', ');
+}
+
 function calculateIntakeKcal(){
   const meals=['breakfast','lunch','dinner','snack'];
   let total=0;
@@ -842,23 +846,7 @@ function fmtDate(ds){const d=new Date(ds+'T00:00:00');return`${d.getMonth()+1}�
 function getWd(ds){const d=new Date(ds+'T00:00:00');return WEEKDAYS[d.getDay()]+'요일';}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-function calculateIntakeKcal(){
-  const breakfast = document.getElementById('inp-breakfast').value || '';
-  const lunch = document.getElementById('inp-lunch').value || '';
-  const dinner = document.getElementById('inp-dinner').value || '';
-  const snack = document.getElementById('inp-snack').value || '';
-  
-  const allText = breakfast + ' ' + lunch + ' ' + dinner + ' ' + snack;
-  
-  const regex = /\((\d+(?:\.\d+)?)\s*kcal/g;
-  let total = 0;
-  let match;
-  while((match = regex.exec(allText)) !== null){
-    total += parseFloat(match[1]);
-  }
-  
-  document.getElementById('inp-intake-kcal').value = total || '';
-}
+
 
 
 function showTab(tab,el){
