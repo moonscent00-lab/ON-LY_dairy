@@ -548,6 +548,7 @@ async function syncSupabase(entry) {
     dinner: entry.dinner||'',
     snack: entry.snack||'',
     intake_kcal: entry.intakeKcal||null,
+    intake_protein: entry.intakeProtein||null,
     burn_kcal: entry.burnKcal||null,
     cardio_type: entry.cardioType||'',
     cardio_min: entry.cardioMin||null,
@@ -586,6 +587,7 @@ async function loadFromSupabase() {
     dinner: r.dinner||'',
     snack: r.snack||'',
     intakeKcal: r.intake_kcal||'',
+    intakeProtein: r.intake_protein||'',
     burnKcal: r.burn_kcal||'',
     cardioType: r.cardio_type||'',
     cardioMin: r.cardio_min||'',
@@ -1009,8 +1011,8 @@ function saveEntry(){
   };
   const inputMemo=document.getElementById('inp-book-memo').value.trim();
   if(inputMemo) todayBookMemoLines.push(inputMemo);
-  const newMemo=todayBookMemoLines.join('\n');
-  entry.bookMemo=newMemo;
+  const newMemo=todayBookMemoLines.filter(Boolean).join('\n');
+  entry.bookMemo=newMemo||entry.bookMemo||'';
 
 
   if(newMemo&&selectedBookIds.size>0){
