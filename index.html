@@ -259,7 +259,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   <!-- 아침 -->
   <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;">아침</div>
   <div class="autocomplete-wrap">
-    <input class="autocomplete-input" id="inp-breakfast" placeholder="음식 검색 후 선택..." autocomplete="off" oninput="acFilter('breakfast',this.value)" onfocus="acFilter('breakfast',this.value)" onblur="setTimeout(()=>acHide('breakfast'),200)">
+    <input class="autocomplete-input" id="inp-breakfast" placeholder="음식 검색 후 선택 또는 입력 후 엔터..." autocomplete="off" oninput="acFilter('breakfast',this.value)" onfocus="acFilter('breakfast',this.value)" onblur="setTimeout(()=>acHide('breakfast'),200)" onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value.trim();if(v){acSelect('breakfast',v);}}">
     <div class="autocomplete-list" id="ac-breakfast" style="display:none;"></div>
   </div>
   <div id="meal-tags-breakfast" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
@@ -271,7 +271,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   <!-- 점심 -->
   <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;">점심</div>
   <div class="autocomplete-wrap">
-    <input class="autocomplete-input" id="inp-lunch" placeholder="음식 검색 후 선택..." autocomplete="off" oninput="acFilter('lunch',this.value)" onfocus="acFilter('lunch',this.value)" onblur="setTimeout(()=>acHide('lunch'),200)">
+    <input class="autocomplete-input" id="inp-lunch" placeholder="음식 검색 후 선택 또는 입력 후 엔터..." autocomplete="off" oninput="acFilter('lunch',this.value)" onfocus="acFilter('lunch',this.value)" onblur="setTimeout(()=>acHide('lunch'),200)" onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value.trim();if(v){acSelect('lunch',v);}}">
     <div class="autocomplete-list" id="ac-lunch" style="display:none;"></div>
   </div>
   <div id="meal-tags-lunch" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
@@ -283,7 +283,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   <!-- 저녁 -->
   <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;">저녁</div>
   <div class="autocomplete-wrap">
-    <input class="autocomplete-input" id="inp-dinner" placeholder="음식 검색 후 선택..." autocomplete="off" oninput="acFilter('dinner',this.value)" onfocus="acFilter('dinner',this.value)" onblur="setTimeout(()=>acHide('dinner'),200)">
+    <input class="autocomplete-input" id="inp-dinner" placeholder="음식 검색 후 선택 또는 입력 후 엔터..." autocomplete="off" oninput="acFilter('dinner',this.value)" onfocus="acFilter('dinner',this.value)" onblur="setTimeout(()=>acHide('dinner'),200)" onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value.trim();if(v){acSelect('dinner',v);}}">
     <div class="autocomplete-list" id="ac-dinner" style="display:none;"></div>
   </div>
   <div id="meal-tags-dinner" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
@@ -295,7 +295,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   <!-- 간식 -->
   <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;">간식</div>
   <div class="autocomplete-wrap">
-    <input class="autocomplete-input" id="inp-snack" placeholder="음식 검색 후 선택..." autocomplete="off" oninput="acFilter('snack',this.value)" onfocus="acFilter('snack',this.value)" onblur="setTimeout(()=>acHide('snack'),200)">
+    <input class="autocomplete-input" id="inp-snack" placeholder="음식 검색 후 선택 또는 입력 후 엔터..." autocomplete="off" oninput="acFilter('snack',this.value)" onfocus="acFilter('snack',this.value)" onblur="setTimeout(()=>acHide('snack'),200)" onkeydown="if(event.key==='Enter'){event.preventDefault();const v=this.value.trim();if(v){acSelect('snack',v);}}">
     <div class="autocomplete-list" id="ac-snack" style="display:none;"></div>
   </div>
   <div id="meal-tags-snack" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
