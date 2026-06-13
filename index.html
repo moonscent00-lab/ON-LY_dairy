@@ -1102,6 +1102,7 @@ function entryHTML(e){
     const parts=[e.cardioType, e.cardioMin?e.cardioMin+'분':'', e.cardioHr?'♥'+e.cardioHr:'', e.cardioKcal?e.cardioKcal+'kcal':''].filter(Boolean);
     chips.push(`<span class="chip chip-exercise">🏃 <span>${parts.join(' · ')}</span></span>`);
   }
+  if(e.intakeKcal)chips.push(`<span class="chip chip-body">🍱 <span>${e.intakeKcal}kcal${e.intakeProtein?' · 단백질 '+e.intakeProtein+'g':''}</span></span>`);
 
   const strengthHtml=e.strength?`<div style="padding:0 16px 10px;">
     <details>
