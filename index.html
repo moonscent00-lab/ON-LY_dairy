@@ -170,7 +170,36 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   </div>
 </div>
 
-<div class="main" id="main-diary"><div id="entries-list"></div></div>
+<div class="main" id="main-diary">
+  <!-- 검색바 -->
+  <div style="display:flex;gap:8px;margin-bottom:14px;">
+    <div style="flex:1;position:relative;">
+      <input id="search-input" type="text" placeholder="🔍 검색..." oninput="renderEntries()" style="width:100%;padding:9px 14px;border:1px solid var(--border2);border-radius:20px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);color:var(--text);outline:none;">
+    </div>
+    <button onclick="toggleView()" id="view-toggle-btn" style="padding:8px 14px;border:1px solid var(--border2);border-radius:20px;font-size:12px;background:var(--surface);color:var(--text2);cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;">📅 달력</button>
+  </div>
+
+  <!-- 달력 뷰 -->
+  <div id="calendar-view" style="display:none;background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <button onclick="calMove(-1)" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--text2);">‹</button>
+      <div id="cal-title" style="font-family:'Noto Serif KR',serif;font-size:16px;font-weight:600;"></div>
+      <button onclick="calMove(1)" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--text2);">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;">
+      <div style="text-align:center;font-size:11px;color:var(--danger);">일</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);">월</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);">화</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);">수</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);">목</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);">금</div>
+      <div style="text-align:center;font-size:11px;color:var(--danger);">토</div>
+    </div>
+    <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;"></div>
+  </div>
+
+  <div id="entries-list"></div>
+</div>
 <div class="main" id="main-stats" style="display:none"><div id="stats-content"></div></div>
 <div class="main" id="main-settings" style="display:none"><div id="settings-content"></div></div>
 
@@ -1174,15 +1203,91 @@ function entryHTML(e){
   </div>`;
 }
 
+let currentView='list'; // 'list' or 'calendar'
+let calYear=today.getFullYear();
+let calMonth=today.getMonth();
+let selectedCalDate=null;
+
+function toggleView(){
+  currentView=currentView==='list'?'calendar':'list';
+  const calView=document.getElementById('calendar-view');
+  const btn=document.getElementById('view-toggle-btn');
+  if(currentView==='calendar'){
+    calView.style.display='block';
+    btn.textContent='📋 리스트';
+    renderCalendar();
+  } else {
+    calView.style.display='none';
+    btn.textContent='📅 달력';
+    selectedCalDate=null;
+    renderEntries();
+  }
+}
+
+function calMove(dir){
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+}
+
+function renderCalendar(){
+  document.getElementById('cal-title').textContent=`${calYear}년 ${calMonth+1}월`;
+  const grid=document.getElementById('cal-grid');
+  const entryDates=new Set(entries.map(e=>e.date));
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const lastDate=new Date(calYear,calMonth+1,0).getDate();
+  const todayStr=today.toISOString().slice(0,10);
+
+  let html='';
+  for(let i=0;i<firstDay;i++) html+=`<div></div>`;
+  for(let d=1;d<=lastDate;d++){
+    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasEntry=entryDates.has(dateStr);
+    const isToday=dateStr===todayStr;
+    const isSelected=dateStr===selectedCalDate;
+    html+=`<div onclick="selectCalDate('${dateStr}')" style="
+      text-align:center;padding:6px 2px;border-radius:8px;cursor:pointer;font-size:13px;
+      background:${isSelected?'var(--text)':isToday?'var(--accent-light)':'none'};
+      color:${isSelected?'#fff':isToday?'var(--accent)':'var(--text)'};
+      font-weight:${isToday||isSelected?'600':'400'};
+      position:relative;">
+      ${d}
+      ${hasEntry?`<div style="width:5px;height:5px;border-radius:50%;background:${isSelected?'#fff':'var(--accent)'};margin:2px auto 0;"></div>`:'<div style="height:7px;"></div>'}
+    </div>`;
+  }
+  grid.innerHTML=html;
+}
+
+function selectCalDate(dateStr){
+  selectedCalDate=selectedCalDate===dateStr?null:dateStr;
+  renderCalendar();
+  renderEntries();
+}
+
 function renderEntries(){
   const list=document.getElementById('entries-list');
-  const sorted=[...entries].sort((a,b)=>b.date.localeCompare(a.date));
-  if(!sorted.length){
-    list.innerHTML=`<div class="empty-state"><div class="empty-icon">📓</div><div class="empty-text">아직 기록이 없어요.<br>+ 버튼으로 오늘의 일기를 써보세요.</div></div>`;
+  const q=(document.getElementById('search-input')?.value||'').trim().toLowerCase();
+  let filtered=[...entries].sort((a,b)=>b.date.localeCompare(a.date));
+
+  // 달력에서 날짜 선택된 경우
+  if(selectedCalDate) filtered=filtered.filter(e=>e.date===selectedCalDate);
+
+  // 검색 필터
+  if(q){
+    filtered=filtered.filter(e=>{
+      const text=[e.text,e.breakfast,e.lunch,e.dinner,e.snack,e.food,e.place,e.bookMemo,e.strength].join(' ').toLowerCase();
+      return text.includes(q);
+    });
+  }
+
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty-state"><div class="empty-icon">${q||selectedCalDate?'🔍':'📓'}</div><div class="empty-text">${q?'검색 결과가 없어요.':selectedCalDate?'이 날의 기록이 없어요.':'아직 기록이 없어요.<br>+ 버튼으로 오늘의 일기를 써보세요.'}</div></div>`;
     return;
   }
-  list.innerHTML=sorted.map(e=>entryHTML(e)).join('');
+  list.innerHTML=filtered.map(e=>entryHTML(e)).join('');
 }
+
 
 function deleteEntry(id){
   if(!confirm('삭제할까요?'))return;
