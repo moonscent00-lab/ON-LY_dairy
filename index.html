@@ -406,14 +406,12 @@ const mealTags = {breakfast:[],lunch:[],dinner:[],snack:[]};
 function addMealItem(key){
   const input=document.getElementById('inp-'+key);
   const val=input.value.trim();
-  // 드롭다운 즉시 숨김
   const list=document.getElementById('ac-'+key);
   if(list)list.style.display='none';
   if(!val)return;
   if(!mealTags[key].includes(val))mealTags[key].push(val);
   input.value='';
   renderMealTags(key);
-  input.focus();
 }
 
 function acSelect(key, val){
