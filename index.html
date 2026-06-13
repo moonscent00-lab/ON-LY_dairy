@@ -362,51 +362,25 @@ const WEEKDAYS=['일','월','화','수','목','금','토'];
 let SHEETS_URL='https://script.google.com/macros/s/AKfycbyQZfPN1wtYYSzwGwUCJ-e9e4xBBkeGLxeg5REenp8aMI2KNBqC16j2G2Mrd2wPBFtvVg/exec';
 
 
-const DIET_MENUS={
-  breakfast:[
-    '',
-    '뉴핏 그레인 + 두유 (337kcal, 단백질 32g)',
-    '없음',
-    '기타 직접 입력'
-  ],
-  lunch:[
-    '',
-    '6.13 횟집 회 (580kcal, 36g)','6.13 고기국밥 (600kcal, 38g)','6.13 한정식 (590kcal, 35g)','6.13 회전초밥 (560kcal, 34g)',
-    '6.14 치즈까스 (650kcal, 40g)','6.14 닭 오븐구이 (620kcal, 42g)','6.14 김밥 (560kcal, 32g)','6.14 소고기 덮밥 (600kcal, 38g)',
-    '6.15 소면 (550kcal, 34g)','6.15 우동 (620kcal, 36g)','6.15 파스타 (640kcal, 38g)','6.15 비빔밥 (610kcal, 40g)',
-    '6.16 꼬치구이 (620kcal, 42g)','6.16 해산물탕 (580kcal, 38g)','6.16 계란밥 (550kcal, 34g)','6.16 스테이크 (640kcal, 44g)',
-    '6.17 생선구이 (580kcal, 40g)','6.17 샤브샤브 (600kcal, 42g)','6.17 돈부리 (630kcal, 38g)','6.17 회덮밥 (570kcal, 36g)',
-    '6.18 소시지구이 (600kcal, 36g)','6.18 소고기 덮밥 (610kcal, 38g)','6.18 닭 소금구이 (590kcal, 40g)','6.18 참깨국수 (560kcal, 34g)',
-    '6.19 명태알밥 (600kcal, 36g)','6.19 소등심구이 (620kcal, 44g)','6.19 칼국수 (570kcal, 32g)','6.19 오징어구이덮밥 (600kcal, 38g)',
-    '6.20 소갈비구이 (640kcal, 45g)','6.20 새우구이덮밥 (610kcal, 40g)','6.20 우동 (600kcal, 34g)','6.20 연어덮밥 (620kcal, 42g)',
-    '6.21 쇠고기국밥 (620kcal, 42g)','6.21 가지구이덮밥 (590kcal, 38g)','6.21 오므라이스 (640kcal, 40g)','6.21 초밥 모둠 (580kcal, 36g)',
-    '6.22 돈사시미 (600kcal, 40g)','6.22 닭 소금구이 (600kcal, 42g)','6.22 메밀국수 (540kcal, 32g)','6.22 해물탕 (610kcal, 38g)',
-    '6.23 쇠고기구이 (630kcal, 44g)','6.23 명란파스타 (620kcal, 38g)','6.23 날치알덮밥 (600kcal, 36g)','6.23 닭 오리엔탈 (610kcal, 40g)',
-    '6.24 흰살생선구이 (570kcal, 38g)','6.24 춘천닭갈비 (620kcal, 40g)','6.24 카레우동 (600kcal, 34g)','6.24 모듬구이덮밥 (630kcal, 42g)',
-    '6.25 소고기간장덮밥 (610kcal, 38g)','6.25 소등심명화 (620kcal, 42g)','6.25 메기구이 (580kcal, 36g)','6.25 닭가슴살덮밥 (600kcal, 44g)',
-    '6.26 소고기국밥 (610kcal, 40g)','6.26 연어구이 (600kcal, 38g)','6.26 카레우동 (620kcal, 34g)','6.26 닭다리오리엔탈 (620kcal, 42g)',
-    '6.27 제육덮밥 (630kcal, 40g)','6.27 새우구이 (590kcal, 36g)','6.27 소바 (560kcal, 32g)','6.27 생선구이 (600kcal, 38g)',
-    '6.28 소불고기 (620kcal, 42g)','6.28 닭간장불고기 (600kcal, 40g)','6.28 파스타 (640kcal, 36g)','6.28 오징어덮밥 (610kcal, 38g)',
-    '6.29 쇠고기샤브샤브 (620kcal, 42g)','6.29 닭가슴살그릴 (600kcal, 44g)','6.29 어묵우동 (600kcal, 32g)','6.29 참치덮밥 (610kcal, 40g)',
-    '6.30 소갈비구이 (640kcal, 45g)','6.30 연어사시미 (600kcal, 38g)','6.30 칼국수 (580kcal, 32g)','6.30 새우덮밥 (620kcal, 40g)',
-    '기타 직접 입력'
-  ],
-  dinner:[
-    '',
-    '새우 + 두부 + 밥 + 나물 (450kcal, 38g)',
-    '참치 + 두부 + 밥 + 나물 (450kcal, 38g)',
-    '연어 + 두부 + 밥 + 나물 (450kcal, 38g)',
-    '없음',
-    '기타 직접 입력'
-  ],
-  snack:[
-    '',
-    '그릭요거트 150g (180kcal, 15g)',
-    '스트링치즈 (100kcal, 10g)',
-    '없음',
-    '기타 직접 입력'
-  ]
-};
+const DIET_MENUS=[
+  '뉴핏그레인',
+  '두유',
+  '우유',
+  '밥',
+  '참치',
+  '계란후라이',
+  '봄동무침',
+  '플레인요거트',
+  '스트링치즈',
+  '새우',
+  '두부',
+  '나물',
+  '연어',
+  '그릭요거트',
+  '닭가슴살',
+  '고구마',
+  '없음',
+];
 
 function initDietSelects(){
   // 자동완성 방식으로 교체되어 별도 초기화 불필요
@@ -415,13 +389,13 @@ function initDietSelects(){
 function acFilter(key, val){
   const list=document.getElementById('ac-'+key);
   if(!list)return;
-  const items=DIET_MENUS[key];
   const q=val.trim().toLowerCase();
-  const items2=items.filter(m=>m!==''); const filtered=q?items2.filter(m=>m.toLowerCase().includes(q)):items2;
+  const filtered=q?DIET_MENUS.filter(m=>m.toLowerCase().includes(q)):DIET_MENUS;
   if(!filtered.length){list.style.display='none';return;}
   list.innerHTML=filtered.map(m=>`<div class="autocomplete-item" onmousedown="acSelect('${key}','${m.replace(/'/g,"&#39;")}')">${m}</div>`).join('');
   list.style.display='block';
 }
+
 
 const mealTags = {breakfast:[],lunch:[],dinner:[],snack:[]};
 
