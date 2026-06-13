@@ -394,7 +394,8 @@ function acFilter(key, val){
   const list=document.getElementById('ac-'+key);
   if(!list)return;
   const q=val.trim().toLowerCase();
-  const filtered=q?DIET_MENUS.filter(m=>m.toLowerCase().includes(q)):DIET_MENUS;
+  if(!q){list.style.display='none';return;}
+  const filtered=DIET_MENUS.filter(m=>m.toLowerCase().includes(q));
   if(!filtered.length){list.style.display='none';return;}
   list.innerHTML=filtered.map(m=>`<div class="autocomplete-item" onmousedown="event.preventDefault();acSelect('${key}','${m.replace(/'/g,"&#39;")}')">${m}</div>`).join('');
   list.style.display='block';
@@ -406,8 +407,10 @@ const mealTags = {breakfast:[],lunch:[],dinner:[],snack:[]};
 function addMealItem(key){
   const input=document.getElementById('inp-'+key);
   const val=input.value.trim();
-  const list=document.getElementById('ac-'+key);
-  if(list)list.style.display='none';
+  ['breakfast','lunch','dinner','snack'].forEach(k=>{
+    const l=document.getElementById('ac-'+k);
+    if(l)l.style.display='none';
+  });
   if(!val)return;
   if(!mealTags[key].includes(val))mealTags[key].push(val);
   input.value='';
@@ -415,13 +418,8 @@ function addMealItem(key){
 }
 
 function acSelect(key, val){
-  const input=document.getElementById('inp-'+key);
-  if(input)input.value='';
-  acHide(key);
-  if(['breakfast','lunch','dinner','snack'].includes(key)){
-    if(!mealTags[key].includes(val))mealTags[key].push(val);
-    renderMealTags(key);
-  }
+  document.getElementById('inp-'+key).value=val;
+  addMealItem(key);
 }
 
 function renderMealTags(key){
