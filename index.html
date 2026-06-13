@@ -396,7 +396,7 @@ function acFilter(key, val){
   const q=val.trim().toLowerCase();
   const filtered=q?DIET_MENUS.filter(m=>m.toLowerCase().includes(q)):DIET_MENUS;
   if(!filtered.length){list.style.display='none';return;}
-  list.innerHTML=filtered.map(m=>`<div class="autocomplete-item" onmousedown="acSelect('${key}','${m.replace(/'/g,"&#39;")}')">${m}</div>`).join('');
+  list.innerHTML=filtered.map(m=>`<div class="autocomplete-item" onmousedown="event.preventDefault();acSelect('${key}','${m.replace(/'/g,"&#39;")}')">${m}</div>`).join('');
   list.style.display='block';
 }
 
