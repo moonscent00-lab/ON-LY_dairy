@@ -268,7 +268,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       <div class="stat-box"><label>시간 <span style="font-size:10px;color:var(--text3);">분</span></label><input type="number" id="inp-cardio-min" placeholder="0" step="1"></div>
       <div class="stat-box"><label>평균심박 <span style="font-size:10px;color:var(--text3);">bpm</span></label><input type="number" id="inp-cardio-hr" placeholder="0" step="1"></div>
       <div class="stat-box"><label>칼로리 <span style="font-size:10px;color:var(--text3);">kcal</span></label><input type="number" id="inp-cardio-kcal" placeholder="0" step="1" oninput="autoBurnKcal()"></div>
-      <div class="stat-box"><label>걸음수 <span style="font-size:10px;color:var(--text3);">보</span></label><input type="number" id="inp-steps" placeholder="0" step="100"></div>
+      <div class="stat-box"><label>걸음수 <span style="font-size:10px;color:var(--text3);">보</span></label><input type="number" id="inp-steps" placeholder="0" step="100" oninput="autoBurnKcal()"></div>
     </div>
   </div>
   <div class="field">
@@ -483,10 +483,13 @@ function getMealText(key){
 function autoBurnKcal(){
   const cardioKcal=parseFloat(document.getElementById('inp-cardio-kcal').value)||0;
   const strengthText=document.getElementById('inp-strength').value||'';
-  // 근력운동 텍스트에서 kcal 숫자 추출 (예: "118 kcal")
-  const match=strengthText.match(/(\d+)\s*kcal/i);
-  const strengthKcal=match?parseFloat(match[1]):0;
-  const total=cardioKcal+strengthKcal;
+  const steps=parseFloat(document.getElementById('inp-steps').value)||0;
+  // 근력운동 텍스트에서 kcal 숫자 추출 (예: "118 kcal") - 마지막 숫자 사용
+  const matches=[...strengthText.matchAll(/(\d+)\s*kcal/gi)];
+  const strengthKcal=matches.length>0?parseFloat(matches[matches.length-1][1]):0;
+  // 걸음수 칼로리 (걸음수 × 0.04 kcal)
+  const stepsKcal=Math.round(steps*0.04);
+  const total=cardioKcal+strengthKcal+stepsKcal;
   if(total>0) document.getElementById('inp-burn-kcal').value=total;
 }
 
@@ -1259,6 +1262,7 @@ function entryHTML(e){
     chips.push(`<span class="chip chip-exercise">🏃 <span>${parts.join(' · ')}</span></span>`);
   }
   if(e.intakeKcal)chips.push(`<span class="chip chip-body">🍱 <span>${e.intakeKcal}kcal${e.intakeProtein?' · 단백질 '+e.intakeProtein+'g':''}</span></span>`);
+  if(e.burnKcal)chips.push(`<span class="chip chip-exercise">🔥 <span>소모 ${e.burnKcal}kcal</span></span>`);
   if(e.steps)chips.push(`<span class="chip chip-body">👟 <span>${Number(e.steps).toLocaleString()}보</span></span>`);
 
   const strengthHtml=e.strength?`<div style="padding:0 16px 10px;">
