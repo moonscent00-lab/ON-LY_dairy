@@ -266,12 +266,12 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
       <div class="stat-box"><label>시간 <span style="font-size:10px;color:var(--text3);">분</span></label><input type="number" id="inp-cardio-min" placeholder="0" step="1"></div>
       <div class="stat-box"><label>평균심박 <span style="font-size:10px;color:var(--text3);">bpm</span></label><input type="number" id="inp-cardio-hr" placeholder="0" step="1"></div>
-      <div class="stat-box"><label>칼로리 <span style="font-size:10px;color:var(--text3);">kcal</span></label><input type="number" id="inp-cardio-kcal" placeholder="0" step="1"></div>
+      <div class="stat-box"><label>칼로리 <span style="font-size:10px;color:var(--text3);">kcal</span></label><input type="number" id="inp-cardio-kcal" placeholder="0" step="1" oninput="autoBurnKcal()"></div>
     </div>
   </div>
   <div class="field">
     <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px;font-weight:500;">근력 <span style="font-weight:400;color:var(--text3);">— 플랜핏 결과 그대로 붙여넣으면 자동 정리</span></label>
-    <textarea id="inp-strength" placeholder="붙여넣기하면 자동으로 정리됩니다" style="min-height:90px;font-size:13px;" onpaste="parsePlanfit(event)"></textarea>
+    <textarea id="inp-strength" placeholder="붙여넣기하면 자동으로 정리됩니다" style="min-height:90px;font-size:13px;" onpaste="parsePlanfit(event)" oninput="autoBurnKcal()"></textarea>
   </div>
 
   <div class="sec-label">독서</div>
@@ -476,6 +476,16 @@ function removeMealTag(key,idx){
 
 function getMealText(key){
   return mealTags[key].join(', ');
+}
+
+function autoBurnKcal(){
+  const cardioKcal=parseFloat(document.getElementById('inp-cardio-kcal').value)||0;
+  const strengthText=document.getElementById('inp-strength').value||'';
+  // 근력운동 텍스트에서 kcal 숫자 추출 (예: "118 kcal")
+  const match=strengthText.match(/(\d+)\s*kcal/i);
+  const strengthKcal=match?parseFloat(match[1]):0;
+  const total=cardioKcal+strengthKcal;
+  if(total>0) document.getElementById('inp-burn-kcal').value=total;
 }
 
 function calculateIntakeKcal(){
@@ -1423,7 +1433,7 @@ function renderStats(){
   const routineStats=allRoutineItems.map(item=>{
     const applicable=sorted.filter(e=>e.routine&&e.routine[item.id]);
     const done=sorted.filter(e=>e.routine&&e.routine[item.id]==='done');
-    return{...item,done:done.length,total:applicable.length,pct:applicable.length?Math.round(done.length/applicable.length*100):0};
+    return{...item,done:done.length,total:sorted.length,pct:sorted.length?Math.round(done.length/sorted.length*100):0};
   }).filter(r=>r.total>0).sort((a,b)=>b.pct-a.pct);
 
   c.innerHTML=`
