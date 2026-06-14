@@ -200,7 +200,12 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
 
   <div id="entries-list"></div>
 </div>
-<div class="main" id="main-stats" style="display:none"><div id="stats-content"></div></div>
+<div class="main" id="main-stats" style="display:none">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+    <button onclick="captureStats()" style="padding:7px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📸 이미지로 저장</button>
+  </div>
+  <div id="stats-content"></div>
+</div>
 <div class="main" id="main-settings" style="display:none"><div id="settings-content"></div></div>
 
 <button class="fab" id="fab-btn" onclick="openModal()" aria-label="새 일기">+</button>
@@ -392,6 +397,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
 </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 const DB='only_v1';
 const DB_SHEETS='only_sheets_url';
@@ -1016,6 +1022,26 @@ function openModal(id){
   }
   document.getElementById('write-modal').style.display='flex';
 }
+async function captureStats(){
+  const el=document.getElementById('stats-content');
+  showToast('📸 캡처 중...');
+  try{
+    const canvas=await html2canvas(el,{
+      backgroundColor:'#F7F5F0',
+      scale:2,
+      useCORS:true,
+      scrollY:0
+    });
+    const a=document.createElement('a');
+    a.download=`only_stats_${new Date().toISOString().slice(0,10)}.png`;
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+    showToast('✅ 이미지 저장 완료!');
+  }catch(e){
+    showToast('❌ 캡처 실패',true);
+  }
+}
+
 function closeWriteModal(){document.getElementById('write-modal').style.display='none';}
 function setMood(m,el){currentMood=m;document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
 function saveEntry(){
