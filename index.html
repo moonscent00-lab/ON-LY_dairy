@@ -658,6 +658,7 @@ async function loadFromSupabase() {
     updatedAt: new Date(r.updated_at).getTime()
   }));
   saveLocal();
+  await loadBooksFromSupabase();
   showToast('✅ 최신 데이터로 갱신됐어요');
   return true;
 }
@@ -866,7 +867,68 @@ function loadLocal(){
 }
 // 로컬 save 함수 (하위 호환)
 function save(){saveLocal();}
-function saveBooks(){saveBooksLocal();}
+async function saveBooks(){
+  saveBooksLocal();
+  await syncBooksToSupabase();
+}
+
+async function syncBooksToSupabase(){
+  try{
+    for(const book of books){
+      const flat={
+        id:book.id,
+        title:book.title||'',
+        author:book.author||'',
+        status:book.status||'reading',
+        start_date:book.startDate||'',
+        end_date:book.endDate||'',
+        notes:book.notes||'',
+        updated_at:new Date().toISOString()
+      };
+      // upsert
+      const check=await fetch(`${SUPABASE_URL}/rest/v1/books?id=eq.${book.id}`,{
+        headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+      });
+      const existing=await check.json();
+      if(existing&&existing.length>0){
+        await fetch(`${SUPABASE_URL}/rest/v1/books?id=eq.${book.id}`,{
+          method:'PATCH',
+          headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+          body:JSON.stringify(flat)
+        });
+      } else {
+        await fetch(`${SUPABASE_URL}/rest/v1/books`,{
+          method:'POST',
+          headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+          body:JSON.stringify(flat)
+        });
+      }
+    }
+  }catch(e){}
+}
+
+async function loadBooksFromSupabase(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/books?order=start_date.desc`,{
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    if(res.ok){
+      const data=await res.json();
+      if(data&&data.length>0){
+        books=data.map(b=>({
+          id:b.id,
+          title:b.title||'',
+          author:b.author||'',
+          status:b.status||'reading',
+          startDate:b.start_date||'',
+          endDate:b.end_date||'',
+          notes:b.notes||''
+        }));
+        saveBooksLocal();
+      }
+    }
+  }catch(e){}
+}
 
 async function loadFromSheets(){
   if(!SHEETS_URL) return false;
@@ -1472,6 +1534,7 @@ function renderSettings(){
       }
       <button class="btn-outline" onclick="document.getElementById('sheets-modal').style.display='flex'">${SHEETS_URL?'🔄 URL 변경':'🔗 URL 등록'}</button>
       <button class="btn-outline" onclick="loadFromSupabase().then(()=>renderEntries())">☁️ Supabase 새로고침</button>
+      <button class="btn-outline" onclick="syncBooksToSupabase().then(()=>showToast('✅ 책 동기화 완료'))">📚 책 Supabase 동기화</button>
       ${SHEETS_URL?`
         <button class="btn-outline" style="margin-top:4px;" onclick="reloadFromSheets()">☁️ 시트에서 새로고침</button>
         <button class="btn-outline red" style="margin-top:4px;" onclick="SHEETS_URL='';localStorage.removeItem('${DB_SHEETS}');renderSettings();">연동 해제</button>`:''}
