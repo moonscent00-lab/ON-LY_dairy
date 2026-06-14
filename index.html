@@ -1086,7 +1086,8 @@ function saveEntry(){
   const inputMemo=document.getElementById('inp-book-memo').value.trim();
   if(inputMemo) todayBookMemoLines.push(inputMemo);
   const newMemo=todayBookMemoLines.filter(Boolean).join('\n');
-  entry.bookMemo=newMemo||entry.bookMemo||'';
+  const existingMemo=editingId?(entries.find(e=>e.id===editingId)||{}).bookMemo||'':'';
+  entry.bookMemo=newMemo||existingMemo;
 
   // 새 일기 작성할 때만 book.notes에 추가 (수정 모드에서는 중복 추가 안 함)
   if(!editingId && newMemo && selectedBookIds.size>0){
