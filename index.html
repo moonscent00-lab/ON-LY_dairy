@@ -206,10 +206,13 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
 <button class="fab" id="fab-btn" onclick="openModal()" aria-label="새 일기">+</button>
 
 <!-- WRITE MODAL -->
-<div class="modal-bg" id="write-modal" style="display:none" onclick="bgClose(event)">
+<div class="modal-bg" id="write-modal" style="display:none">
 <div class="modal">
   <div class="modal-handle"></div>
-  <div class="modal-title" id="modal-title">새 일기</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <div class="modal-title" id="modal-title" style="margin-bottom:0;">새 일기</div>
+    <button onclick="document.getElementById('write-modal').style.display='none'" style="border:none;background:none;font-size:22px;color:var(--text3);cursor:pointer;padding:0 4px;line-height:1;">×</button>
+  </div>
 
   <div class="field">
     <label>날짜</label>
@@ -1059,8 +1062,8 @@ function saveEntry(){
   const newMemo=todayBookMemoLines.filter(Boolean).join('\n');
   entry.bookMemo=newMemo||entry.bookMemo||'';
 
-
-  if(newMemo&&selectedBookIds.size>0){
+  // 새 일기 작성할 때만 book.notes에 추가 (수정 모드에서는 중복 추가 안 함)
+  if(!editingId && newMemo && selectedBookIds.size>0){
     const d=new Date();
     const datePrefix='['+(d.getMonth()+1)+'/'+d.getDate()+'] ';
     [...selectedBookIds].forEach(bid=>{
