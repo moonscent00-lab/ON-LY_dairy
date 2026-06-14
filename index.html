@@ -211,7 +211,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   <div class="modal-handle"></div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
     <div class="modal-title" id="modal-title" style="margin-bottom:0;">새 일기</div>
-    <button onclick="document.getElementById('write-modal').style.display='none'" style="border:none;background:none;font-size:22px;color:var(--text3);cursor:pointer;padding:0 4px;line-height:1;">×</button>
+    <button onclick="closeWriteModal()" style="border:none;background:none;font-size:22px;color:var(--text3);cursor:pointer;padding:0 4px;line-height:1;">×</button>
   </div>
 
   <div class="field">
@@ -1016,7 +1016,7 @@ function openModal(id){
   }
   document.getElementById('write-modal').style.display='flex';
 }
-function bgClose(ev){if(ev.target.classList.contains('modal-bg'))document.getElementById('write-modal').style.display='none';}
+function closeWriteModal(){document.getElementById('write-modal').style.display='none';}
 function setMood(m,el){currentMood=m;document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
 function saveEntry(){
   const date=document.getElementById('inp-date').value;
@@ -1300,64 +1300,47 @@ function deleteEntry(id){
 }
 
 
+let statsPeriod=30;
+
 function renderStats(){
   const c=document.getElementById('stats-content');
-  const sorted=[...entries].sort((a,b)=>a.date.localeCompare(b.date));
+  const now=new Date();
+  const cutoff=new Date(now);
+  cutoff.setDate(cutoff.getDate()-(statsPeriod===0?9999:statsPeriod));
+  const cutoffStr=cutoff.toISOString().slice(0,10);
+
+  const all=[...entries].sort((a,b)=>a.date.localeCompare(b.date));
+  const sorted=statsPeriod===0?all:all.filter(e=>e.date>=cutoffStr);
 
   const total=entries.length;
-  const exerciseDays=entries.filter(e=>e.cardioType||e.strength).length;
-  const bookDays=entries.filter(e=>e.bookIds&&e.bookIds.length).length;
-  const proteinO=entries.filter(e=>e.protein==='O').length;
-  const proteinAll=entries.filter(e=>e.protein).length;
+  const exerciseDays=sorted.filter(e=>e.cardioType||e.strength).length;
+  const bookDays=sorted.filter(e=>e.bookIds&&e.bookIds.length).length;
+  const proteinO=sorted.filter(e=>e.protein==='O').length;
+  const proteinAll=sorted.filter(e=>e.protein).length;
 
-  // 체지방률 추이
-  const fatEntries=sorted.filter(e=>e.fat);
-  const fatBars=fatEntries.slice(-10).map(e=>{
-    const v=parseFloat(e.fat);
-    const max=Math.max(...fatEntries.map(x=>parseFloat(x.fat)));
-    const min=Math.min(...fatEntries.map(x=>parseFloat(x.fat)));
-    const pct=Math.round((v-min)/(max-min+0.01)*100);
-    const color=v>30?'var(--danger)':v>25?'var(--accent2)':'var(--accent)';
-    return`<div class="bar-row"><div class="bar-lbl">${fmtDate(e.date).replace('월 ','/')}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(pct,4)}%;background:${color}"></div></div><div class="bar-val">${v.toFixed(1)}%</div></div>`;
-  }).join('');
+  const fatEntries=all.filter(e=>e.fat);
+  const muscleEntries=all.filter(e=>e.muscle);
+  const weightEntries=all.filter(e=>e.weight);
 
-  // 골격근량 추이
-  const muscleEntries=sorted.filter(e=>e.muscle);
-  const muscleBars=muscleEntries.slice(-10).map(e=>{
-    const v=parseFloat(e.muscle);
-    const max=Math.max(...muscleEntries.map(x=>parseFloat(x.muscle)));
-    const min=Math.min(...muscleEntries.map(x=>parseFloat(x.muscle)));
-    const pct=Math.round((v-min)/(max-min+0.01)*100);
-    return`<div class="bar-row"><div class="bar-lbl">${fmtDate(e.date).replace('월 ','/')}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(pct,4)}%"></div></div><div class="bar-val">${v.toFixed(1)}kg</div></div>`;
-  }).join('');
-
-  // 소모칼로리 추이
-  const burnEntries=sorted.filter(e=>e.burnKcal||e.cardioKcal);
-  const burnBars=burnEntries.slice(-10).map(e=>{
-    const v=parseInt(e.burnKcal||e.cardioKcal||0);
-    const max=Math.max(...burnEntries.map(x=>parseInt(x.burnKcal||x.cardioKcal||0)));
-    const pct=Math.round(v/(max+1)*100);
-    return`<div class="bar-row"><div class="bar-lbl">${fmtDate(e.date).replace('월 ','/')}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(pct,4)}%;background:var(--accent2)"></div></div><div class="bar-val">${v}</div></div>`;
-  }).join('');
-
-  // 루틴 달성률
-  const allRoutineItems=ROUTINE_GROUPS.flatMap(g=>g.items);
-  const routineStats=allRoutineItems.map(item=>{
-    const applicable=entries.filter(e=>e.routine&&e.routine[item.id]);
-    const done=entries.filter(e=>e.routine&&e.routine[item.id]==='done');
-    return{...item,done:done.length,total:applicable.length,pct:applicable.length?Math.round(done.length/applicable.length*100):0};
-  }).filter(r=>r.total>0).sort((a,b)=>b.done-a.done);
-
-  // 체성분 최근값
   const latestFat=fatEntries.length?parseFloat(fatEntries[fatEntries.length-1].fat):null;
   const prevFat=fatEntries.length>1?parseFloat(fatEntries[fatEntries.length-2].fat):null;
   const latestMuscle=muscleEntries.length?parseFloat(muscleEntries[muscleEntries.length-1].muscle):null;
   const prevMuscle=muscleEntries.length>1?parseFloat(muscleEntries[muscleEntries.length-2].muscle):null;
-
   const fatChange=latestFat&&prevFat?(latestFat-prevFat).toFixed(1):null;
   const muscleChange=latestMuscle&&prevMuscle?(latestMuscle-prevMuscle).toFixed(1):null;
 
+  // 루틴 달성률
+  const allRoutineItems=ROUTINE_GROUPS.flatMap(g=>g.items);
+  const routineStats=allRoutineItems.map(item=>{
+    const applicable=sorted.filter(e=>e.routine&&e.routine[item.id]);
+    const done=sorted.filter(e=>e.routine&&e.routine[item.id]==='done');
+    return{...item,done:done.length,total:applicable.length,pct:applicable.length?Math.round(done.length/applicable.length*100):0};
+  }).filter(r=>r.total>0).sort((a,b)=>b.pct-a.pct);
+
   c.innerHTML=`
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;">
+      ${[7,30,90,0].map(p=>`<button onclick="statsPeriod=${p};renderStats()" style="padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border2);background:${statsPeriod===p?'var(--text)':'none'};color:${statsPeriod===p?'#fff':'var(--text2)'};cursor:pointer;font-family:'Noto Sans KR',sans-serif;">${p===0?'전체':p+'일'}</button>`).join('')}
+    </div>
     <div class="stats-cards">
       <div class="stats-card">
         <div class="stats-card-lbl">체지방률</div>
@@ -1369,16 +1352,63 @@ function renderStats(){
         <div class="stats-card-val">${latestMuscle?latestMuscle.toFixed(1)+'<span style="font-size:12px"> kg</span>':'—'}</div>
         ${muscleChange?`<div class="stats-card-sub" style="color:${muscleChange>0?'var(--accent)':'var(--danger)'}">${muscleChange>0?'+':''}${muscleChange}kg</div>`:''}
       </div>
-      <div class="stats-card"><div class="stats-card-lbl">총 기록일</div><div class="stats-card-val">${total}<span style="font-size:12px"> 일</span></div></div>
-      <div class="stats-card"><div class="stats-card-lbl">운동한 날</div><div class="stats-card-val">${exerciseDays}<span style="font-size:12px"> 일</span></div><div class="stats-card-sub">${total?Math.round(exerciseDays/total*100):0}%</div></div>
-      <div class="stats-card"><div class="stats-card-lbl">독서한 날</div><div class="stats-card-val">${bookDays}<span style="font-size:12px"> 일</span></div><div class="stats-card-sub">${total?Math.round(bookDays/total*100):0}%</div></div>
+      <div class="stats-card"><div class="stats-card-lbl">기록일</div><div class="stats-card-val">${sorted.length}<span style="font-size:12px"> 일</span></div></div>
+      <div class="stats-card"><div class="stats-card-lbl">운동한 날</div><div class="stats-card-val">${exerciseDays}<span style="font-size:12px"> 일</span></div><div class="stats-card-sub">${sorted.length?Math.round(exerciseDays/sorted.length*100):0}%</div></div>
+      <div class="stats-card"><div class="stats-card-lbl">독서한 날</div><div class="stats-card-val">${bookDays}<span style="font-size:12px"> 일</span></div><div class="stats-card-sub">${sorted.length?Math.round(bookDays/sorted.length*100):0}%</div></div>
       <div class="stats-card"><div class="stats-card-lbl">단백질 달성</div><div class="stats-card-val">${proteinAll?Math.round(proteinO/proteinAll*100):'—'}<span style="font-size:12px"> %</span></div><div class="stats-card-sub">${proteinO}/${proteinAll}일</div></div>
     </div>
-    ${fatBars?`<div class="chart-box"><div class="chart-title">체지방률 추이</div>${fatBars}</div>`:''}
-    ${muscleBars?`<div class="chart-box"><div class="chart-title">골격근량 추이</div>${muscleBars}</div>`:''}
-    ${burnBars?`<div class="chart-box"><div class="chart-title">소모 칼로리 추이</div>${burnBars}</div>`:''}
-    ${routineStats.length?`<div class="chart-box"><div class="chart-title">루틴 달성률</div>${routineStats.map(r=>`<div class="routine-stat-row"><div class="routine-stat-name">${r.label}</div><div class="routine-stat-bar"><div class="routine-stat-fill" style="width:${r.pct}%"></div></div><div class="routine-stat-pct">${r.pct}%</div></div>`).join('')}</div>`:''}
+    ${fatEntries.length>1?`<div class="chart-box"><div class="chart-title">📉 체지방률 추이</div>${lineChart(fatEntries,'fat','%','var(--danger)')}</div>`:''}
+    ${muscleEntries.length>1?`<div class="chart-box"><div class="chart-title">💪 골격근량 추이</div>${lineChart(muscleEntries,'muscle','kg','var(--accent)')}</div>`:''}
+    ${weightEntries.length>1?`<div class="chart-box"><div class="chart-title">⚖️ 체중 추이</div>${lineChart(weightEntries,'weight','kg','var(--info)')}</div>`:''}
+    ${routineStats.length?`<div class="chart-box"><div class="chart-title">✅ 루틴 달성률</div>${routineStats.map(r=>`<div class="routine-stat-row"><div class="routine-stat-name">${r.label}</div><div class="routine-stat-bar"><div class="routine-stat-fill" style="width:${r.pct}%"></div></div><div class="routine-stat-pct">${r.pct}%</div></div>`).join('')}</div>`:''}
   `;
+}
+
+function lineChart(data, key, unit, color){
+  const vals=data.map(e=>parseFloat(e[key]));
+  const min=Math.min(...vals);
+  const max=Math.max(...vals);
+  const range=max-min||0.1;
+  const W=420, H=120, PX=40, PY=16;
+  const iW=W-PX*2, iH=H-PY*2;
+  const n=data.length;
+  const pts=vals.map((v,i)=>{
+    const x=PX+(i/(Math.max(n-1,1)))*iW;
+    const y=PY+iH-(((v-min)/range)*iH);
+    return[x,y];
+  });
+  const polyline=pts.map(p=>p.join(',')).join(' ');
+  const area=`${PX},${PY+iH} `+pts.map(p=>p.join(',')).join(' ')+` ${PX+iW},${PY+iH}`;
+
+  // 날짜 라벨 (최대 5개)
+  const step=Math.ceil(n/5);
+  const labels=pts.filter((_,i)=>i%step===0||i===n-1).map(([x],i2)=>{
+    const idx=i2*step>=n?n-1:i2*step;
+    const d=data[Math.min(idx,n-1)];
+    const lbl=fmtDate(d.date).replace('월 ','/')+'일';
+    return`<text x="${x}" y="${H-2}" text-anchor="middle" font-size="9" fill="var(--text3)">${lbl}</text>`;
+  });
+
+  // 값 라벨 (점 위)
+  const dotLabels=pts.map(([x,y],i)=>`
+    <circle cx="${x}" cy="${y}" r="3.5" fill="${color}" stroke="#fff" stroke-width="1.5"/>
+    ${i===0||i===n-1||n<=7?`<text x="${x}" y="${y-7}" text-anchor="middle" font-size="9" fill="${color}" font-weight="600">${vals[i].toFixed(1)}</text>`:''}
+  `).join('');
+
+  return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;overflow:visible;">
+    <defs>
+      <linearGradient id="g${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="${area}" fill="url(#g${key})"/>
+    <polyline points="${polyline}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dotLabels}
+    ${labels.join('')}
+    <text x="${PX-4}" y="${PY+4}" text-anchor="end" font-size="9" fill="var(--text3)">${max.toFixed(1)}</text>
+    <text x="${PX-4}" y="${PY+iH+4}" text-anchor="end" font-size="9" fill="var(--text3)">${min.toFixed(1)}</text>
+  </svg>`;
 }
 
 function renderSettings(){
