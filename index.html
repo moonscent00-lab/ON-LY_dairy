@@ -268,6 +268,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       <div class="stat-box"><label>시간 <span style="font-size:10px;color:var(--text3);">분</span></label><input type="number" id="inp-cardio-min" placeholder="0" step="1"></div>
       <div class="stat-box"><label>평균심박 <span style="font-size:10px;color:var(--text3);">bpm</span></label><input type="number" id="inp-cardio-hr" placeholder="0" step="1"></div>
       <div class="stat-box"><label>칼로리 <span style="font-size:10px;color:var(--text3);">kcal</span></label><input type="number" id="inp-cardio-kcal" placeholder="0" step="1" oninput="autoBurnKcal()"></div>
+      <div class="stat-box"><label>걸음수 <span style="font-size:10px;color:var(--text3);">보</span></label><input type="number" id="inp-steps" placeholder="0" step="100"></div>
     </div>
   </div>
   <div class="field">
@@ -611,6 +612,7 @@ async function syncSupabase(entry) {
     cardio_min: entry.cardioMin||null,
     cardio_hr: entry.cardioHr||null,
     cardio_kcal: entry.cardioKcal||null,
+    steps: entry.steps||null,
     strength: entry.strength||'',
     food: entry.food||'',
     text: entry.text||'',
@@ -658,6 +660,7 @@ async function loadFromSupabase() {
     cardioMin: r.cardio_min||'',
     cardioHr: r.cardio_hr||'',
     cardioKcal: r.cardio_kcal||'',
+    steps: r.steps||'',
     strength: r.strength||'',
     food: r.food||'',
     text: r.text||'',
@@ -1022,6 +1025,7 @@ function openModal(id){
   document.getElementById('inp-cardio-min').value='';
   document.getElementById('inp-cardio-hr').value='';
   document.getElementById('inp-cardio-kcal').value='';
+  document.getElementById('inp-steps').value='';
   document.getElementById('inp-cardio-type-custom').value='';
   document.getElementById('inp-cardio-type-custom').style.display='none';
   selectedCardioType='';
@@ -1063,6 +1067,7 @@ function openModal(id){
     document.getElementById('inp-cardio-min').value=e.cardioMin||'';
     document.getElementById('inp-cardio-hr').value=e.cardioHr||'';
     document.getElementById('inp-cardio-kcal').value=e.cardioKcal||'';
+    document.getElementById('inp-steps').value=e.steps||'';
     selectedCardioType=e.cardioType||'';
     document.querySelectorAll('#cardio-type-row .rt-btn').forEach(b=>{
       if(b.textContent.includes(selectedCardioType)&&selectedCardioType) b.classList.add('done');
@@ -1131,6 +1136,7 @@ function saveEntry(){
     cardioMin:document.getElementById('inp-cardio-min').value,
     cardioHr:document.getElementById('inp-cardio-hr').value,
     cardioKcal:document.getElementById('inp-cardio-kcal').value,
+    steps:document.getElementById('inp-steps').value,
     strength:document.getElementById('inp-strength').value,
     bookIds:[...selectedBookIds],
     bookMemo:document.getElementById('inp-book-memo').value,
@@ -1253,6 +1259,7 @@ function entryHTML(e){
     chips.push(`<span class="chip chip-exercise">🏃 <span>${parts.join(' · ')}</span></span>`);
   }
   if(e.intakeKcal)chips.push(`<span class="chip chip-body">🍱 <span>${e.intakeKcal}kcal${e.intakeProtein?' · 단백질 '+e.intakeProtein+'g':''}</span></span>`);
+  if(e.steps)chips.push(`<span class="chip chip-body">👟 <span>${Number(e.steps).toLocaleString()}보</span></span>`);
 
   const strengthHtml=e.strength?`<div style="padding:0 16px 10px;">
     <details>
