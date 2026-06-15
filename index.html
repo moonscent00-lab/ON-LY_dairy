@@ -484,7 +484,7 @@ function autoBurnKcal(){
   const cardioKcal=parseFloat(document.getElementById('inp-cardio-kcal').value)||0;
   const strengthText=document.getElementById('inp-strength').value||'';
   const steps=parseFloat(document.getElementById('inp-steps').value)||0;
-  // 근력운동 텍스트에서 kcal 숫자 추출 (예: "118 kcal") - 마지막 숫자 사용
+  // 근력운동 텍스트에서 kcal 숫자 추출 (예: "118 kcal" 또는 "242 kcal")
   const matches=[...strengthText.matchAll(/(\d+)\s*kcal/gi)];
   const strengthKcal=matches.length>0?parseFloat(matches[matches.length-1][1]):0;
   // 걸음수 칼로리 (걸음수 × 0.04 kcal)
@@ -776,7 +776,15 @@ function parsePlanfit(ev){
   const start=ta.selectionStart;
   const cur=ta.value;
   ta.value=cur.slice(0,start)+result.trim()+cur.slice(ta.selectionEnd);
+  setTimeout(autoBurnKcal, 100);
 }
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    const modal=document.getElementById('write-modal');
+    if(modal&&modal.style.display!=='none') closeWriteModal();
+  }
+});
 
 /* ── 책 관리 ── */
 function buildBookSelectArea(){
