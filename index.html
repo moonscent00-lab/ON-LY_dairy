@@ -1395,6 +1395,8 @@ function selectCalDate(dateStr){
   renderEntries();
 }
 
+let listShowCount=10;
+
 function renderEntries(){
   const list=document.getElementById('entries-list');
   const q=(document.getElementById('search-input')?.value||'').trim().toLowerCase();
@@ -1415,7 +1417,14 @@ function renderEntries(){
     list.innerHTML=`<div class="empty-state"><div class="empty-icon">${q||selectedCalDate?'🔍':'📓'}</div><div class="empty-text">${q?'검색 결과가 없어요.':selectedCalDate?'이 날의 기록이 없어요.':'아직 기록이 없어요.<br>+ 버튼으로 오늘의 일기를 써보세요.'}</div></div>`;
     return;
   }
-  list.innerHTML=filtered.map(e=>entryHTML(e)).join('');
+
+  // 달력 모드나 검색 모드가 아닐 때만 개수 제한
+  const limited=(!selectedCalDate&&!q);
+  const shown=limited?filtered.slice(0,listShowCount):filtered;
+  const hasMore=limited&&filtered.length>listShowCount;
+
+  list.innerHTML=shown.map(e=>entryHTML(e)).join('')+
+    (hasMore?`<div style="text-align:center;padding:16px;"><button onclick="listShowCount+=10;renderEntries()" style="padding:10px 24px;border:1px solid var(--border2);border-radius:20px;font-size:13px;background:none;color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">더 보기 (${filtered.length-listShowCount}개 남음)</button></div>`:'');
 }
 
 
