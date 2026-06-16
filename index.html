@@ -177,11 +177,11 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <div style="flex:1;position:relative;">
       <input id="search-input" type="text" placeholder="🔍 검색..." oninput="renderEntries()" style="width:100%;padding:9px 14px;border:1px solid var(--border2);border-radius:20px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);color:var(--text);outline:none;">
     </div>
-    <button onclick="toggleView()" id="view-toggle-btn" style="padding:8px 14px;border:1px solid var(--border2);border-radius:20px;font-size:12px;background:var(--surface);color:var(--text2);cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;">📅 달력</button>
+    <button onclick="toggleView()" id="view-toggle-btn" style="padding:8px 14px;border:1px solid var(--border2);border-radius:20px;font-size:12px;background:var(--surface);color:var(--text2);cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;">📋 리스트</button>
   </div>
 
   <!-- 달력 뷰 -->
-  <div id="calendar-view" style="display:none;background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:14px;">
+  <div id="calendar-view" style="background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:14px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
       <button onclick="calMove(-1)" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--text2);">‹</button>
       <div id="cal-title" style="font-family:'Noto Serif KR',serif;font-size:16px;font-weight:600;"></div>
@@ -983,9 +983,10 @@ async function initApp(){
   loadLocal();
   initDietSelects();
   document.getElementById('nav-today').textContent=`${today.getMonth()+1}월 ${today.getDate()}일 ${WEEKDAYS[today.getDay()]}`;
+  renderCalendar();
+  renderEntries();
   const ok = await loadFromSupabase();
-  if(!ok) renderEntries();
-  else renderEntries();
+  if(ok){renderCalendar();renderEntries();}
 }
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
 function fmtDate(ds){const d=new Date(ds+'T00:00:00');return`${d.getMonth()+1}월 ${d.getDate()}일`;}
@@ -1332,10 +1333,10 @@ function entryHTML(e){
   </div>`;
 }
 
-let currentView='list'; // 'list' or 'calendar'
+let currentView='calendar';
 let calYear=today.getFullYear();
 let calMonth=today.getMonth();
-let selectedCalDate=null;
+let selectedCalDate=today.toISOString().slice(0,10);
 
 function toggleView(){
   currentView=currentView==='list'?'calendar':'list';
