@@ -1115,7 +1115,6 @@ function openModal(id){
     buildRoutineEditor(e.routine||{});
   }
   document.getElementById('write-modal').style.display='flex';
-  document.body.style.overflow='hidden';
 }
 async function captureStats(){
   const el=document.getElementById('stats-content');
@@ -1139,7 +1138,6 @@ async function captureStats(){
 
 function closeWriteModal(){
   document.getElementById('write-modal').style.display='none';
-  document.body.style.overflow='';
 }
 function setMood(m,el){currentMood=m;document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
 function saveEntry(){
@@ -1723,4 +1721,4 @@ async function reloadFromSheets(){
 initApp();
 </script>
 </body>
-</html>
+</html> 
