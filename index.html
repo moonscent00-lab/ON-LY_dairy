@@ -1345,11 +1345,15 @@ function toggleView(){
   if(currentView==='calendar'){
     calView.style.display='block';
     btn.textContent='📋 리스트';
+    selectedCalDate=today.toISOString().slice(0,10);
+    listShowCount=10;
     renderCalendar();
+    renderEntries();
   } else {
     calView.style.display='none';
     btn.textContent='📅 달력';
     selectedCalDate=null;
+    listShowCount=10;
     renderEntries();
   }
 }
