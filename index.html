@@ -347,11 +347,22 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-snack-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()"></div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
     <div class="stat-box"><label>총 섭취 kcal</label><input type="number" id="inp-intake-kcal" placeholder="0" step="10" readonly style="background:var(--bg);"></div>
-    <div class="stat-box"><label>총 단백질 g</label><input type="number" id="inp-intake-protein" placeholder="0" step="1" readonly style="background:var(--bg);"></div>
     <div class="stat-box"><label>소모 kcal</label><input type="number" id="inp-burn-kcal" placeholder="0" step="10"></div>
+    <div class="stat-box"><label>탄수화물 g</label><input type="number" id="inp-intake-carb" placeholder="0" step="1" readonly style="background:var(--bg);"></div>
+    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-intake-protein" placeholder="0" step="1" readonly style="background:var(--bg);"></div>
+    <div class="stat-box"><label>지방 g</label><input type="number" id="inp-intake-fat" placeholder="0" step="1" readonly style="background:var(--bg);"></div>
   </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:14px;">
+    <button type="button" onclick="analyzeNutrition()" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">✨ AI 영양 분석</button>
+    <label style="flex:1;padding:10px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;text-align:center;">
+      📸 사진으로 분석
+      <input type="file" id="inp-food-photo" accept="image/*" style="display:none" onchange="analyzePhoto(event)">
+    </label>
+  </div>
+  <div id="ai-nutrition-result" style="display:none;margin-bottom:14px;padding:12px;background:var(--purple-light);border-radius:var(--r-sm);font-size:12px;color:var(--purple);line-height:1.8;"></div>
   <div class="field"><textarea id="inp-food" placeholder="기타 식단 메모 (선택사항)" style="min-height:50px;font-size:13px;"></textarea></div>
   <div class="field"><textarea id="inp-text" placeholder="오늘 있었던 일, 생각, 느낌..."></textarea></div>
 
@@ -610,6 +621,8 @@ async function syncSupabase(entry) {
     snack_protein: entry.snackProtein||null,
     intake_kcal: entry.intakeKcal||null,
     intake_protein: entry.intakeProtein||null,
+    intake_carb: entry.intakeCarb||null,
+    intake_fat: entry.intakeFat||null,
     burn_kcal: entry.burnKcal||null,
     cardio_type: entry.cardioType||'',
     cardio_min: entry.cardioMin||null,
@@ -658,6 +671,8 @@ async function loadFromSupabase() {
     snackProtein: r.snack_protein||'',
     intakeKcal: r.intake_kcal||'',
     intakeProtein: r.intake_protein||'',
+    intakeCarb: r.intake_carb||'',
+    intakeFat: r.intake_fat||'',
     burnKcal: r.burn_kcal||'',
     cardioType: r.cardio_type||'',
     cardioMin: r.cardio_min||'',
@@ -1062,6 +1077,10 @@ function openModal(id){
     document.getElementById('inp-'+k+'-protein').value='';
   });
   document.getElementById('inp-intake-kcal').value='';
+  document.getElementById('inp-intake-protein').value='';
+  document.getElementById('inp-intake-carb').value='';
+  document.getElementById('inp-intake-fat').value='';
+  document.getElementById('ai-nutrition-result').style.display='none';
   document.getElementById('inp-burn-kcal').value='';
   document.getElementById('inp-text').value='';
   document.getElementById('inp-place').value='';
@@ -1106,6 +1125,8 @@ function openModal(id){
     });
     calculateIntakeKcal();
     document.getElementById('inp-intake-protein').value=e.intakeProtein||'';
+    document.getElementById('inp-intake-carb').value=e.intakeCarb||'';
+    document.getElementById('inp-intake-fat').value=e.intakeFat||'';
     document.getElementById('inp-burn-kcal').value=e.burnKcal||'';
     document.getElementById('inp-text').value=e.text||'';
     document.getElementById('inp-place').value=e.place||'';
@@ -1134,6 +1155,98 @@ async function captureStats(){
   }catch(e){
     showToast('❌ 캡처 실패',true);
   }
+}
+
+const GEMINI_API_KEY='AIzaSyD7_BD1Ws7aFOpl4VkBEj3w2bGbuMQtJa4';
+
+async function callGemini(prompt, imageBase64=null, mimeType=null){
+  const content=[];
+  if(imageBase64) content.push({inlineData:{data:imageBase64,mimeType}});
+  content.push({text:prompt});
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:content}]})
+  });
+  const data=await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+}
+
+async function analyzeNutrition(){
+  const meals={
+    아침:getMealText('breakfast'),
+    점심:getMealText('lunch'),
+    저녁:getMealText('dinner'),
+    간식:getMealText('snack')
+  };
+  const mealList=Object.entries(meals).filter(([,v])=>v).map(([k,v])=>`${k}: ${v}`).join('\n');
+  if(!mealList){showToast('음식을 먼저 입력해줘!',true);return;}
+
+  const resultBox=document.getElementById('ai-nutrition-result');
+  resultBox.style.display='block';
+  resultBox.textContent='✨ 분석 중...';
+
+  try{
+    const prompt=`다음 식단의 영양소를 추정해줘. 반드시 JSON 형식으로만 답해줘 (다른 텍스트 없이):
+{"kcal":숫자,"carb":숫자,"protein":숫자,"fat":숫자,"summary":"한줄설명"}
+
+식단:
+${mealList}
+
+각 음식의 일반적인 1인분 기준으로 추정해줘.`;
+
+    const text=await callGemini(prompt);
+    const clean=text.replace(/```json|```/g,'').trim();
+    const data=JSON.parse(clean);
+
+    document.getElementById('inp-intake-kcal').value=data.kcal||'';
+    document.getElementById('inp-intake-carb').value=data.carb||'';
+    document.getElementById('inp-intake-protein').value=data.protein||'';
+    document.getElementById('inp-intake-fat').value=data.fat||'';
+
+    resultBox.innerHTML=`✨ AI 추정 결과<br>
+🔥 ${data.kcal}kcal &nbsp;|&nbsp; 🌾 탄수화물 ${data.carb}g &nbsp;|&nbsp; 🥩 단백질 ${data.protein}g &nbsp;|&nbsp; 🫙 지방 ${data.fat}g<br>
+<span style="font-size:11px;opacity:.8;">${data.summary}</span>`;
+  }catch(e){
+    resultBox.textContent='❌ 분석 실패. 다시 시도해줘.';
+  }
+}
+
+async function analyzePhoto(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const resultBox=document.getElementById('ai-nutrition-result');
+  resultBox.style.display='block';
+  resultBox.textContent='📸 사진 분석 중...';
+
+  try{
+    const base64=await new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=()=>res(r.result.split(',')[1]);
+      r.onerror=rej;
+      r.readAsDataURL(file);
+    });
+
+    const prompt=`이 음식 사진을 보고 영양소를 추정해줘. 반드시 JSON 형식으로만 답해줘 (다른 텍스트 없이):
+{"kcal":숫자,"carb":숫자,"protein":숫자,"fat":숫자,"foods":"발견한 음식들","summary":"한줄설명"}`;
+
+    const text=await callGemini(prompt, base64, file.type);
+    const clean=text.replace(/```json|```/g,'').trim();
+    const data=JSON.parse(clean);
+
+    document.getElementById('inp-intake-kcal').value=data.kcal||'';
+    document.getElementById('inp-intake-carb').value=data.carb||'';
+    document.getElementById('inp-intake-protein').value=data.protein||'';
+    document.getElementById('inp-intake-fat').value=data.fat||'';
+
+    resultBox.innerHTML=`📸 사진 분석 결과<br>
+🍽 ${data.foods}<br>
+🔥 ${data.kcal}kcal &nbsp;|&nbsp; 🌾 탄수화물 ${data.carb}g &nbsp;|&nbsp; 🥩 단백질 ${data.protein}g &nbsp;|&nbsp; 🫙 지방 ${data.fat}g<br>
+<span style="font-size:11px;opacity:.8;">${data.summary}</span>`;
+  }catch(e){
+    resultBox.textContent='❌ 분석 실패. 다시 시도해줘.';
+  }
+  event.target.value='';
 }
 
 function closeWriteModal(){
@@ -1172,6 +1285,8 @@ function saveEntry(){
     snackProtein:document.getElementById('inp-snack-protein').value,
     intakeKcal:document.getElementById('inp-intake-kcal').value,
     intakeProtein:document.getElementById('inp-intake-protein').value,
+    intakeCarb:document.getElementById('inp-intake-carb').value,
+    intakeFat:document.getElementById('inp-intake-fat').value,
     burnKcal:document.getElementById('inp-burn-kcal').value,
     food:document.getElementById('inp-food').value,
     text:document.getElementById('inp-text').value,
