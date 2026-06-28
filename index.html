@@ -1569,7 +1569,10 @@ function renderSettings(){
     ${done.map(b=>`<div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;display:flex;justify-content:space-between;align-items:center;">
       <div><div style="color:var(--text2);">✅ ${esc(b.title)}</div>${b.author?`<div style="font-size:11px;color:var(--text3);">${esc(b.author)}</div>`:''}
       <div style="font-size:10px;color:var(--text3);">${b.startDate||'?'} → ${b.endDate||'?'}</div></div>
-      <button onclick="deleteBook('${b.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;flex-shrink:0;">삭제</button>
+      <div style="display:flex;gap:6px;">
+        <button onclick="viewBookNotes('${b.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:pointer;">메모보기</button>
+        <button onclick="deleteBook('${b.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;flex-shrink:0;">삭제</button>
+      </div>
     </div>`).join('')}`:''}
   `:`<div style="font-size:13px;color:var(--text3);">등록된 책이 없어요.</div>`;
 
@@ -1721,4 +1724,4 @@ async function reloadFromSheets(){
 initApp();
 </script>
 </body>
-</html> 
+</html>
