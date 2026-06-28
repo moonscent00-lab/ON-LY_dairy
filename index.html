@@ -248,17 +248,10 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   <div class="routine-editor" id="routine-editor"></div>
 
   <div class="sec-label">체성분</div>
-  <div class="stats-grid">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
     <div class="stat-box"><label>체중 kg</label><input type="number" id="inp-weight" placeholder="0.0" step="0.01"></div>
     <div class="stat-box"><label>골격근량 kg</label><input type="number" id="inp-muscle" placeholder="0.0" step="0.01"></div>
     <div class="stat-box"><label>체지방률 %</label><input type="number" id="inp-fat" placeholder="0.0" step="0.1"></div>
-    <div class="stat-box"><label>단백질 목표</label>
-      <select id="inp-protein">
-        <option value="">-</option>
-        <option value="O">✅ 달성</option>
-        <option value="X">❌ 미달</option>
-      </select>
-    </div>
   </div>
 
   <div class="sec-label">운동</div>
@@ -267,15 +260,14 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="cardio-type-row">
       <button class="rt-btn" onclick="setCardioType('수영',this)">🏊 수영</button>
       <button class="rt-btn" onclick="setCardioType('홈트',this)">🏠 홈트</button>
-      <button class="rt-btn" onclick="setCardioType('트레킹',this)">🥾 트레킹</button>
+      <button class="rt-btn" onclick="setCardioType('산책/트레킹',this)">🥾 산책/트레킹</button>
       <button class="rt-btn" onclick="setCardioType('러닝',this)">🏃 러닝</button>
-      <button class="rt-btn" onclick="setCardioType('자전거',this)">🚴 자전거</button>
       <button class="rt-btn" onclick="setCardioType('기타',this)">➕ 기타</button>
     </div>
     <input type="text" id="inp-cardio-type-custom" placeholder="직접 입력" style="display:none;width:100%;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);margin-bottom:10px;">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;">
       <div class="stat-box"><label>시간 <span style="font-size:10px;color:var(--text3);">분</span></label><input type="number" id="inp-cardio-min" placeholder="0" step="1"></div>
-      <div class="stat-box"><label>평균심박 <span style="font-size:10px;color:var(--text3);">bpm</span></label><input type="number" id="inp-cardio-hr" placeholder="0" step="1"></div>
+      <div class="stat-box"><label>심박 <span style="font-size:10px;color:var(--text3);">bpm</span></label><input type="number" id="inp-cardio-hr" placeholder="0" step="1"></div>
       <div class="stat-box"><label>칼로리 <span style="font-size:10px;color:var(--text3);">kcal</span></label><input type="number" id="inp-cardio-kcal" placeholder="0" step="1" oninput="autoBurnKcal()"></div>
       <div class="stat-box"><label>걸음수 <span style="font-size:10px;color:var(--text3);">보</span></label><input type="number" id="inp-steps" placeholder="0" step="100" oninput="autoBurnKcal()"></div>
     </div>
@@ -364,15 +356,6 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <div class="stat-box"><label>지방 g</label><input type="number" id="inp-intake-fat" placeholder="0" step="1" readonly style="background:var(--bg);"></div>
   </div>
 
-  <div style="display:flex;gap:8px;margin-bottom:14px;">
-    <button type="button" onclick="analyzeNutrition()" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">✨ AI 영양 분석</button>
-    <label style="flex:1;padding:10px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;text-align:center;">
-      📸 사진으로 분석
-      <input type="file" id="inp-food-photo" accept="image/*" style="display:none" onchange="analyzePhoto(event)">
-    </label>
-  </div>
-  <div id="ai-nutrition-result" style="display:none;margin-bottom:14px;padding:12px;background:var(--purple-light);border-radius:var(--r-sm);font-size:12px;color:var(--purple);line-height:1.8;"></div>
-  <div class="field"><textarea id="inp-food" placeholder="기타 식단 메모 (선택사항)" style="min-height:50px;font-size:13px;"></textarea></div>
   <div class="field"><textarea id="inp-text" placeholder="오늘 있었던 일, 생각, 느낌..."></textarea></div>
 
   <div class="sec-label">장소 & 링크 메모</div>
@@ -704,14 +687,12 @@ async function loadFromSupabase() {
   return true;
 }
 const ROUTINE_GROUPS=[
-  {id:'life', label:'라이프', items:[
+  {id:'life', label:'라이프/운동', items:[
     {id:'book',label:'📚 독서'},
     {id:'water',label:'💧 물 1L'},
     {id:'sup_am',label:'💊 영양제 ☀️'},
     {id:'sup_pm',label:'💊 영양제 🌙'},
     {id:'record',label:'📝 기록&계획'},
-  ]},
-  {id:'exercise', label:'운동', items:[
     {id:'cardio',label:'🏃 유산소'},
     {id:'strength',label:'🏋️ 근력'},
   ]},
@@ -1097,6 +1078,7 @@ function openModal(id){
   document.getElementById('sync-status-wrap').style.display='none';
   document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('on'));
   buildRoutineEditor({});
+  resetOneThing();
   calculateIntakeKcal();
   if(id){
     editingId=id;
@@ -1143,6 +1125,9 @@ function openModal(id){
     currentMood=e.mood||'';
     if(e.mood)document.querySelectorAll('.mood-btn').forEach(b=>{if(b.textContent===e.mood)b.classList.add('on');});
     buildRoutineEditor(e.routine||{});
+    document.getElementById('inp-one-thing').value=e.oneThing||'';
+    if(e.oneThingDone===true) setOneThingDone(true);
+    else if(e.oneThingDone===false) setOneThingDone(false);
   }
   document.getElementById('write-modal').style.display='flex';
 }
@@ -1258,6 +1243,24 @@ async function analyzePhoto(event){
   event.target.value='';
 }
 
+let oneThingDone=null;
+function setOneThingDone(done, el){
+  oneThingDone=done;
+  document.getElementById('btn-one-thing-done').style.background=done?'var(--accent)':'none';
+  document.getElementById('btn-one-thing-done').style.color=done?'#fff':'var(--text2)';
+  document.getElementById('btn-one-thing-fail').style.background=!done?'var(--danger)':'none';
+  document.getElementById('btn-one-thing-fail').style.color=!done?'#fff':'var(--text2)';
+}
+
+function resetOneThing(){
+  oneThingDone=null;
+  document.getElementById('inp-one-thing').value='';
+  document.getElementById('btn-one-thing-done').style.background='none';
+  document.getElementById('btn-one-thing-done').style.color='var(--text2)';
+  document.getElementById('btn-one-thing-fail').style.background='none';
+  document.getElementById('btn-one-thing-fail').style.color='var(--text2)';
+}
+
 function closeWriteModal(){
   document.getElementById('write-modal').style.display='none';
 }
@@ -1267,7 +1270,8 @@ function saveEntry(){
   if(!date){alert('날짜를 선택해주세요.');return;}
   const entry={
     id:editingId||genId(),date,mood:currentMood,
-    routine:{...routineState},
+    oneThing:document.getElementById('inp-one-thing').value,
+    oneThingDone:oneThingDone,
     weight:document.getElementById('inp-weight').value,
     muscle:document.getElementById('inp-muscle').value,
     fat:document.getElementById('inp-fat').value,
@@ -1435,15 +1439,11 @@ function entryHTML(e){
 
   const readBooks=(e.bookIds||[]).map(id=>books.find(b=>b.id===id)).filter(Boolean);
   const bookHtml=readBooks.length?`<div class="entry-book">
-    <details>
-      <summary style="font-size:12px;color:var(--purple);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--purple-light);border-radius:20px;width:fit-content;">
-        📖 <span style="font-weight:500;">독서 기록 보기</span>
-      </summary>
-      <div style="margin-top:8px;">
-        ${readBooks.map(b=>`<div class="book-tag"><span class="book-icon">📖</span><div><strong>${esc(b.title)}</strong>${b.author?`<span style="font-size:11px;opacity:.7;margin-left:5px;">${esc(b.author)}</span>`:''}</div></div>`).join('')}
-        ${e.bookMemo?`<div style="font-size:13px;margin-top:8px;padding:8px 12px;background:var(--purple-light);border-radius:8px;color:var(--purple);white-space:pre-wrap;line-height:1.7;">${esc(e.bookMemo)}</div>`:''}
-      </div>
-    </details>
+    ${readBooks.map(b=>`<div class="book-tag"><span class="book-icon">📖</span><div><strong>${esc(b.title)}</strong>${b.author?`<span style="font-size:11px;opacity:.7;margin-left:5px;">${esc(b.author)}</span>`:''}</div></div>`).join('')}
+    ${e.bookMemo?`<details style="margin-top:8px;">
+      <summary style="font-size:12px;color:var(--purple);cursor:pointer;list-style:none;padding:4px 10px;background:var(--purple-light);border-radius:20px;width:fit-content;">💬 메모 보기</summary>
+      <div style="font-size:13px;margin-top:8px;padding:8px 12px;background:var(--purple-light);border-radius:8px;color:var(--purple);white-space:pre-wrap;line-height:1.7;">${esc(e.bookMemo)}</div>
+    </details>`:''}
   </div>`:'';
 
 
@@ -1457,6 +1457,7 @@ function entryHTML(e){
     ${foodHtml}
     ${routineDisplayHTML(e.routine)}
     ${bookHtml}
+    ${e.oneThing?`<div style="padding:6px 16px 10px;"><div style="display:inline-flex;align-items:center;gap:8px;background:${e.oneThingDone===true?'var(--accent-light)':e.oneThingDone===false?'#fce8e8':'var(--bg)'};border-radius:8px;padding:8px 12px;font-size:13px;color:${e.oneThingDone===true?'var(--accent)':e.oneThingDone===false?'var(--danger)':'var(--text2)'};">🎯 <span>${esc(e.oneThing)}</span>${e.oneThingDone===true?' ✅':e.oneThingDone===false?' ❌':''}</div></div>`:''}
     ${e.text?`<div class="entry-text">${esc(e.text)}</div>`:''}
     ${placeHtml}
     <div class="entry-footer">
