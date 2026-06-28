@@ -1042,7 +1042,7 @@ function openModal(id){
   document.getElementById('modal-title').textContent='새 일기';
   document.getElementById('inp-date').value=today.toISOString().slice(0,10);
   ['weight','muscle','fat'].forEach(k=>document.getElementById('inp-'+k).value='');
-  document.getElementById('inp-protein').value='';
+  // inp-protein removed
   document.getElementById('inp-cardio-min').value='';
   document.getElementById('inp-cardio-hr').value='';
   document.getElementById('inp-cardio-kcal').value='';
@@ -1058,7 +1058,7 @@ function openModal(id){
   if(linesBox)linesBox.style.display='none';
   selectedBookIds=new Set();
   buildBookSelectArea();
-  document.getElementById('inp-food').value='';
+  // inp-food removed
   ['breakfast','lunch','dinner','snack'].forEach(k=>{
     mealTags[k]=[];
     renderMealTags(k);
@@ -1089,7 +1089,7 @@ function openModal(id){
     document.getElementById('inp-weight').value=e.weight||'';
     document.getElementById('inp-muscle').value=e.muscle||'';
     document.getElementById('inp-fat').value=e.fat||'';
-    document.getElementById('inp-protein').value=e.protein||'';
+    // inp-protein removed
     document.getElementById('inp-cardio-min').value=e.cardioMin||'';
     document.getElementById('inp-cardio-hr').value=e.cardioHr||'';
     document.getElementById('inp-cardio-kcal').value=e.cardioKcal||'';
@@ -1106,7 +1106,7 @@ function openModal(id){
     document.getElementById('inp-book-memo').value=e.bookMemo||'';
     selectedBookIds=new Set(e.bookIds||[]);
     buildBookSelectArea();
-    document.getElementById('inp-food').value=e.food||'';
+    // inp-food removed
     ['breakfast','lunch','dinner','snack'].forEach(k=>{
       mealTags[k]=e[k]?e[k].split(', ').filter(Boolean):[];
       renderMealTags(k);
@@ -1275,7 +1275,7 @@ function saveEntry(){
     weight:document.getElementById('inp-weight').value,
     muscle:document.getElementById('inp-muscle').value,
     fat:document.getElementById('inp-fat').value,
-    protein:document.getElementById('inp-protein').value,
+    protein:'',
     cardioType:(selectedCardioType==='기타'?document.getElementById('inp-cardio-type-custom').value:selectedCardioType),
     cardioMin:document.getElementById('inp-cardio-min').value,
     cardioHr:document.getElementById('inp-cardio-hr').value,
@@ -1301,7 +1301,7 @@ function saveEntry(){
     intakeCarb:document.getElementById('inp-intake-carb').value,
     intakeFat:document.getElementById('inp-intake-fat').value,
     burnKcal:document.getElementById('inp-burn-kcal').value,
-    food:document.getElementById('inp-food').value,
+    food:'',
     text:document.getElementById('inp-text').value,
     place:document.getElementById('inp-place').value,
     link:document.getElementById('inp-link').value,
