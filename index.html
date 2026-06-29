@@ -1049,8 +1049,6 @@ function openModal(id){
     mealTags[k]=[];
     renderMealTags(k);
     document.getElementById('inp-'+k).value='';
-    document.getElementById('inp-'+k+'-kcal').value='';
-    document.getElementById('inp-'+k+'-protein').value='';
   });
   document.getElementById('inp-intake-kcal').value='';
   document.getElementById('inp-intake-protein').value='';
@@ -1095,10 +1093,8 @@ function openModal(id){
       mealTags[k]=e[k]?e[k].split(', ').filter(Boolean):[];
       renderMealTags(k);
       document.getElementById('inp-'+k).value='';
-      document.getElementById('inp-'+k+'-kcal').value=e[k+'Kcal']||'';
-      document.getElementById('inp-'+k+'-protein').value=e[k+'Protein']||'';
     });
-    calculateIntakeKcal();
+    document.getElementById('inp-intake-kcal').value=e.intakeKcal||'';
     document.getElementById('inp-intake-protein').value=e.intakeProtein||'';
     document.getElementById('inp-burn-kcal').value=e.burnKcal||'';
     document.getElementById('inp-text').value=e.text||'';
