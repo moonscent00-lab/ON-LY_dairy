@@ -479,10 +479,8 @@ function autoBurnKcal(){
 }
 
 function calculateIntakeKcal(){
-function calculateIntakeKcal(){
   // 끼니별 자동 계산 제거 - 수동 입력 방식으로 변경
 }
-
 
 function acHide(key){
   const list=document.getElementById('ac-'+key);
@@ -1139,78 +1137,6 @@ async function callGemini(prompt, imageBase64=null, mimeType=null){
   return data.candidates?.[0]?.content?.parts?.[0]?.text||'';
 }
 
-async function analyzeNutrition(){
-  const meals={
-    아침:getMealText('breakfast'),
-    점심:getMealText('lunch'),
-    저녁:getMealText('dinner'),
-    간식:getMealText('snack')
-  };
-  const mealList=Object.entries(meals).filter(([,v])=>v).map(([k,v])=>`${k}: ${v}`).join('\n');
-  if(!mealList){showToast('음식을 먼저 입력해줘!',true);return;}
-
-  const resultBox=document.getElementById('ai-nutrition-result');
-  resultBox.style.display='block';
-  resultBox.textContent='✨ 분석 중...';
-
-  try{
-    const prompt=`다음 식단의 영양소를 추정해줘. 반드시 JSON 형식으로만 답해줘 (다른 텍스트 없이):
-{"kcal":숫자,"carb":숫자,"protein":숫자,"fat":숫자,"summary":"한줄설명"}
-
-식단:
-${mealList}
-
-각 음식의 일반적인 1인분 기준으로 추정해줘.`;
-
-    const text=await callGemini(prompt);
-    const clean=text.replace(/```json|```/g,'').trim();
-    const data=JSON.parse(clean);
-
-    document.getElementById('inp-intake-kcal').value=data.kcal||'';
-    document.getElementById('inp-intake-protein').value=data.protein||'';
-
-    resultBox.innerHTML=`✨ AI 추정 결과<br>
-🔥 ${data.kcal}kcal &nbsp;|&nbsp; 🌾 탄수화물 ${data.carb}g &nbsp;|&nbsp; 🥩 단백질 ${data.protein}g &nbsp;|&nbsp; 🫙 지방 ${data.fat}g<br>
-<span style="font-size:11px;opacity:.8;">${data.summary}</span>`;
-  }catch(e){
-    resultBox.textContent='❌ 분석 실패. 다시 시도해줘.';
-  }
-}
-
-async function analyzePhoto(event){
-  const file=event.target.files[0];
-  if(!file)return;
-  const resultBox=document.getElementById('ai-nutrition-result');
-  resultBox.style.display='block';
-  resultBox.textContent='📸 사진 분석 중...';
-
-  try{
-    const base64=await new Promise((res,rej)=>{
-      const r=new FileReader();
-      r.onload=()=>res(r.result.split(',')[1]);
-      r.onerror=rej;
-      r.readAsDataURL(file);
-    });
-
-    const prompt=`이 음식 사진을 보고 영양소를 추정해줘. 반드시 JSON 형식으로만 답해줘 (다른 텍스트 없이):
-{"kcal":숫자,"carb":숫자,"protein":숫자,"fat":숫자,"foods":"발견한 음식들","summary":"한줄설명"}`;
-
-    const text=await callGemini(prompt, base64, file.type);
-    const clean=text.replace(/```json|```/g,'').trim();
-    const data=JSON.parse(clean);
-
-    document.getElementById('inp-intake-kcal').value=data.kcal||'';
-    document.getElementById('inp-intake-protein').value=data.protein||'';
-
-    resultBox.innerHTML=`📸 사진 분석 결과<br>
-🍽 ${data.foods}<br>
-🔥 ${data.kcal}kcal &nbsp;|&nbsp; 🌾 탄수화물 ${data.carb}g &nbsp;|&nbsp; 🥩 단백질 ${data.protein}g &nbsp;|&nbsp; 🫙 지방 ${data.fat}g<br>
-<span style="font-size:11px;opacity:.8;">${data.summary}</span>`;
-  }catch(e){
-    resultBox.textContent='❌ 분석 실패. 다시 시도해줘.';
-  }
-  event.target.value='';
-}
 
 let oneThingDone=null;
 function setOneThingDone(done, el){
