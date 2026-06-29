@@ -303,11 +303,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <button type="button" onmousedown="event.preventDefault();addMealItem('breakfast')" style="padding:0 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:18px;cursor:pointer;flex-shrink:0;">+</button>
     <div class="autocomplete-list" id="ac-breakfast" style="display:none;"></div>
   </div>
-  <div id="meal-tags-breakfast" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-    <div class="stat-box"><label>칼로리</label><input type="number" id="inp-breakfast-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()"></div>
-    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-breakfast-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()"></div>
-  </div>
+  <div id="meal-tags-breakfast" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 12px;"></div>
 
   <!-- 점심 -->
   <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;">점심</div>
@@ -316,11 +312,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <button type="button" onmousedown="event.preventDefault();addMealItem('lunch')" style="padding:0 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:18px;cursor:pointer;flex-shrink:0;">+</button>
     <div class="autocomplete-list" id="ac-lunch" style="display:none;"></div>
   </div>
-  <div id="meal-tags-lunch" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-    <div class="stat-box"><label>칼로리</label><input type="number" id="inp-lunch-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()"></div>
-    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-lunch-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()"></div>
-  </div>
+  <div id="meal-tags-lunch" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 12px;"></div>
 
   <!-- 저녁 -->
   <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;">저녁</div>
@@ -329,11 +321,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <button type="button" onmousedown="event.preventDefault();addMealItem('dinner')" style="padding:0 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:18px;cursor:pointer;flex-shrink:0;">+</button>
     <div class="autocomplete-list" id="ac-dinner" style="display:none;"></div>
   </div>
-  <div id="meal-tags-dinner" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-    <div class="stat-box"><label>칼로리</label><input type="number" id="inp-dinner-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()"></div>
-    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-dinner-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()"></div>
-  </div>
+  <div id="meal-tags-dinner" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 12px;"></div>
 
   <!-- 간식 -->
   <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;">간식</div>
@@ -342,18 +330,12 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <button type="button" onmousedown="event.preventDefault();addMealItem('snack')" style="padding:0 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:18px;cursor:pointer;flex-shrink:0;">+</button>
     <div class="autocomplete-list" id="ac-snack" style="display:none;"></div>
   </div>
-  <div id="meal-tags-snack" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 4px;"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-    <div class="stat-box"><label>칼로리</label><input type="number" id="inp-snack-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()"></div>
-    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-snack-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()"></div>
-  </div>
+  <div id="meal-tags-snack" style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 12px;"></div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-    <div class="stat-box"><label>총 섭취 kcal</label><input type="number" id="inp-intake-kcal" placeholder="0" step="10" readonly style="background:var(--bg);"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
+    <div class="stat-box"><label>총 칼로리</label><input type="number" id="inp-intake-kcal" placeholder="0" step="10"></div>
+    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-intake-protein" placeholder="0" step="1"></div>
     <div class="stat-box"><label>소모 kcal</label><input type="number" id="inp-burn-kcal" placeholder="0" step="10"></div>
-    <div class="stat-box"><label>탄수화물 g</label><input type="number" id="inp-intake-carb" placeholder="0" step="1" readonly style="background:var(--bg);"></div>
-    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-intake-protein" placeholder="0" step="1" readonly style="background:var(--bg);"></div>
-    <div class="stat-box"><label>지방 g</label><input type="number" id="inp-intake-fat" placeholder="0" step="1" readonly style="background:var(--bg);"></div>
   </div>
 
   <div class="field"><textarea id="inp-text" placeholder="오늘 있었던 일, 생각, 느낌..."></textarea></div>
@@ -595,6 +577,8 @@ async function syncSupabase(entry) {
     id: entry.id,
     date: entry.date,
     mood: entry.mood||'',
+    one_thing: entry.oneThing||'',
+    one_thing_done: entry.oneThingDone===null?null:entry.oneThingDone,
     weight: entry.weight||null,
     muscle: entry.muscle||null,
     fat: entry.fat||null,
@@ -645,6 +629,8 @@ async function loadFromSupabase() {
     id: r.id,
     date: r.date,
     mood: r.mood||'',
+    oneThing: r.one_thing||'',
+    oneThingDone: r.one_thing_done===null?null:r.one_thing_done,
     weight: r.weight||'',
     muscle: r.muscle||'',
     fat: r.fat||'',
@@ -1068,8 +1054,6 @@ function openModal(id){
   });
   document.getElementById('inp-intake-kcal').value='';
   document.getElementById('inp-intake-protein').value='';
-  document.getElementById('inp-intake-carb').value='';
-  document.getElementById('inp-intake-fat').value='';
   
   document.getElementById('inp-burn-kcal').value='';
   document.getElementById('inp-text').value='';
@@ -1116,8 +1100,6 @@ function openModal(id){
     });
     calculateIntakeKcal();
     document.getElementById('inp-intake-protein').value=e.intakeProtein||'';
-    document.getElementById('inp-intake-carb').value=e.intakeCarb||'';
-    document.getElementById('inp-intake-fat').value=e.intakeFat||'';
     document.getElementById('inp-burn-kcal').value=e.burnKcal||'';
     document.getElementById('inp-text').value=e.text||'';
     document.getElementById('inp-place').value=e.place||'';
@@ -1194,9 +1176,7 @@ ${mealList}
     const data=JSON.parse(clean);
 
     document.getElementById('inp-intake-kcal').value=data.kcal||'';
-    document.getElementById('inp-intake-carb').value=data.carb||'';
     document.getElementById('inp-intake-protein').value=data.protein||'';
-    document.getElementById('inp-intake-fat').value=data.fat||'';
 
     resultBox.innerHTML=`✨ AI 추정 결과<br>
 🔥 ${data.kcal}kcal &nbsp;|&nbsp; 🌾 탄수화물 ${data.carb}g &nbsp;|&nbsp; 🥩 단백질 ${data.protein}g &nbsp;|&nbsp; 🫙 지방 ${data.fat}g<br>
@@ -1229,9 +1209,7 @@ async function analyzePhoto(event){
     const data=JSON.parse(clean);
 
     document.getElementById('inp-intake-kcal').value=data.kcal||'';
-    document.getElementById('inp-intake-carb').value=data.carb||'';
     document.getElementById('inp-intake-protein').value=data.protein||'';
-    document.getElementById('inp-intake-fat').value=data.fat||'';
 
     resultBox.innerHTML=`📸 사진 분석 결과<br>
 🍽 ${data.foods}<br>
@@ -1289,18 +1267,8 @@ function saveEntry(){
     lunch:getMealText('lunch'),
     dinner:getMealText('dinner'),
     snack:getMealText('snack'),
-    breakfastKcal:document.getElementById('inp-breakfast-kcal').value,
-    breakfastProtein:document.getElementById('inp-breakfast-protein').value,
-    lunchKcal:document.getElementById('inp-lunch-kcal').value,
-    lunchProtein:document.getElementById('inp-lunch-protein').value,
-    dinnerKcal:document.getElementById('inp-dinner-kcal').value,
-    dinnerProtein:document.getElementById('inp-dinner-protein').value,
-    snackKcal:document.getElementById('inp-snack-kcal').value,
-    snackProtein:document.getElementById('inp-snack-protein').value,
     intakeKcal:document.getElementById('inp-intake-kcal').value,
     intakeProtein:document.getElementById('inp-intake-protein').value,
-    intakeCarb:document.getElementById('inp-intake-carb').value,
-    intakeFat:document.getElementById('inp-intake-fat').value,
     burnKcal:document.getElementById('inp-burn-kcal').value,
     food:'',
     text:document.getElementById('inp-text').value,
