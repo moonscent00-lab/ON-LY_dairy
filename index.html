@@ -95,7 +95,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
 .routine-group{margin-bottom:12px;}
 .routine-group-title{font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;}
 .routine-toggle-row{display:flex;flex-wrap:wrap;gap:6px;}
-.rt-btn{padding:6px 12px;border-radius:20px;font-size:12px;border:1px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+.rt-btn{padding:4px 8px;border-radius:20px;font-size:11px;border:1px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
 .rt-btn.done{background:var(--accent);color:#fff;border-color:var(--accent);}
 .rt-btn.skip{background:var(--bg);color:var(--text3);border-style:dashed;}
 
@@ -215,66 +215,79 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
 <div class="modal-bg" id="write-modal" style="display:none">
 <div class="modal">
   <div class="modal-handle"></div>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
     <div class="modal-title" id="modal-title" style="margin-bottom:0;">새 일기</div>
     <button onclick="closeWriteModal()" style="border:none;background:none;font-size:22px;color:var(--text3);cursor:pointer;padding:0 4px;line-height:1;">×</button>
   </div>
 
-  <div class="field">
-    <label>날짜</label>
-    <input type="date" id="inp-date">
-  </div>
-  <div class="field">
-    <label>컨디션</label>
-    <div class="mood-row">
-      <button class="mood-btn" onclick="setMood('😴',this)">😴</button>
-      <button class="mood-btn" onclick="setMood('😔',this)">😔</button>
-      <button class="mood-btn" onclick="setMood('😐',this)">😐</button>
-      <button class="mood-btn" onclick="setMood('🙂',this)">🙂</button>
-      <button class="mood-btn" onclick="setMood('😊',this)">😊</button>
+  <!-- 날짜 + 컨디션 한 줄 -->
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+    <input type="date" id="inp-date" style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+    <div style="display:flex;gap:4px;">
+      <button class="mood-btn" onclick="setMood('😴',this)" style="padding:5px 7px;font-size:16px;">😴</button>
+      <button class="mood-btn" onclick="setMood('😡',this)" style="padding:5px 7px;font-size:16px;">😡</button>
+      <button class="mood-btn" onclick="setMood('😢',this)" style="padding:5px 7px;font-size:16px;">😢</button>
+      <button class="mood-btn" onclick="setMood('🙂',this)" style="padding:5px 7px;font-size:16px;">🙂</button>
+      <button class="mood-btn" onclick="setMood('😊',this)" style="padding:5px 7px;font-size:16px;">😊</button>
     </div>
   </div>
 
-  <div class="sec-label">🎯 오늘의 원씽</div>
-  <div class="field">
-    <input type="text" id="inp-one-thing" placeholder="오늘 반드시 해야 할 단 하나는?">
-  </div>
-  <div style="display:flex;gap:8px;margin-bottom:14px;">
-    <button type="button" onclick="setOneThingDone(true,this)" id="btn-one-thing-done" style="flex:1;padding:8px;border:1px solid var(--border2);border-radius:var(--r-sm);background:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">✅ 달성</button>
-    <button type="button" onclick="setOneThingDone(false,this)" id="btn-one-thing-fail" style="flex:1;padding:8px;border:1px solid var(--border2);border-radius:var(--r-sm);background:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">❌ 미달성</button>
+  <!-- 오늘의 원씽 한 줄 -->
+  <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;">
+    <span style="font-size:13px;color:var(--accent);font-weight:500;white-space:nowrap;">🎯</span>
+    <input type="text" id="inp-one-thing" placeholder="오늘의 원씽" style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+    <button type="button" id="btn-one-thing-done" onclick="setOneThingDone(true,this)" style="padding:5px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:none;font-size:16px;cursor:pointer;">✅</button>
+    <button type="button" id="btn-one-thing-fail" onclick="setOneThingDone(false,this)" style="padding:5px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:none;font-size:16px;cursor:pointer;">❌</button>
   </div>
 
+  <!-- 루틴 체크 -->
   <div class="sec-label">루틴 체크</div>
   <div class="routine-editor" id="routine-editor"></div>
 
+  <!-- 체성분 -->
   <div class="sec-label">체성분</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
-    <div class="stat-box"><label>체중 kg</label><input type="number" id="inp-weight" placeholder="0.0" step="0.01"></div>
-    <div class="stat-box"><label>골격근량 kg</label><input type="number" id="inp-muscle" placeholder="0.0" step="0.01"></div>
-    <div class="stat-box"><label>체지방률 %</label><input type="number" id="inp-fat" placeholder="0.0" step="0.1"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;">
+    <div style="background:var(--bg);border-radius:var(--r-sm);padding:7px 10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:2px;">체중 kg</div><input type="number" id="inp-weight" placeholder="0.0" step="0.01" style="border:none;background:none;font-size:14px;font-weight:500;width:100%;padding:0;font-family:'Noto Sans KR',sans-serif;"></div>
+    <div style="background:var(--bg);border-radius:var(--r-sm);padding:7px 10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:2px;">골격근 kg</div><input type="number" id="inp-muscle" placeholder="0.0" step="0.01" style="border:none;background:none;font-size:14px;font-weight:500;width:100%;padding:0;font-family:'Noto Sans KR',sans-serif;"></div>
+    <div style="background:var(--bg);border-radius:var(--r-sm);padding:7px 10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:2px;">체지방 %</div><input type="number" id="inp-fat" placeholder="0.0" step="0.1" style="border:none;background:none;font-size:14px;font-weight:500;width:100%;padding:0;font-family:'Noto Sans KR',sans-serif;"></div>
   </div>
 
+  <!-- 운동 -->
   <div class="sec-label">운동</div>
-  <div style="margin-bottom:12px;">
-    <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;">유산소 종류</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="cardio-type-row">
+  <div style="margin-bottom:8px;">
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;" id="cardio-type-row">
       <button class="rt-btn" onclick="setCardioType('수영',this)">🏊 수영</button>
       <button class="rt-btn" onclick="setCardioType('홈트',this)">🏠 홈트</button>
-      <button class="rt-btn" onclick="setCardioType('산책/트레킹',this)">🥾 산책/트레킹</button>
+      <button class="rt-btn" onclick="setCardioType('산책/트레킹',this)">🥾 산책</button>
       <button class="rt-btn" onclick="setCardioType('러닝',this)">🏃 러닝</button>
       <button class="rt-btn" onclick="setCardioType('기타',this)">➕ 기타</button>
     </div>
-    <input type="text" id="inp-cardio-type-custom" placeholder="직접 입력" style="display:none;width:100%;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);margin-bottom:10px;">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;">
-      <div class="stat-box"><label>시간 <span style="font-size:10px;color:var(--text3);">분</span></label><input type="number" id="inp-cardio-min" placeholder="0" step="1"></div>
-      <div class="stat-box"><label>심박 <span style="font-size:10px;color:var(--text3);">bpm</span></label><input type="number" id="inp-cardio-hr" placeholder="0" step="1"></div>
-      <div class="stat-box"><label>칼로리 <span style="font-size:10px;color:var(--text3);">kcal</span></label><input type="number" id="inp-cardio-kcal" placeholder="0" step="1" oninput="autoBurnKcal()"></div>
-      <div class="stat-box"><label>걸음수 <span style="font-size:10px;color:var(--text3);">보</span></label><input type="number" id="inp-steps" placeholder="0" step="100" oninput="autoBurnKcal()"></div>
+    <input type="text" id="inp-cardio-type-custom" placeholder="직접 입력" style="display:none;width:100%;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);margin-bottom:8px;">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:6px;">
+      <div style="background:var(--bg);border-radius:var(--r-sm);padding:6px 4px;text-align:center;"><div style="font-size:9px;color:var(--text3);">분</div><input type="number" id="inp-cardio-min" placeholder="0" step="1" style="border:none;background:none;font-size:13px;font-weight:500;width:100%;padding:0;text-align:center;font-family:'Noto Sans KR',sans-serif;"></div>
+      <div style="background:var(--bg);border-radius:var(--r-sm);padding:6px 4px;text-align:center;"><div style="font-size:9px;color:var(--text3);">심박</div><input type="number" id="inp-cardio-hr" placeholder="0" step="1" style="border:none;background:none;font-size:13px;font-weight:500;width:100%;padding:0;text-align:center;font-family:'Noto Sans KR',sans-serif;"></div>
+      <div style="background:var(--bg);border-radius:var(--r-sm);padding:6px 4px;text-align:center;"><div style="font-size:9px;color:var(--text3);">kcal</div><input type="number" id="inp-cardio-kcal" placeholder="0" step="1" oninput="autoBurnKcal()" style="border:none;background:none;font-size:13px;font-weight:500;width:100%;padding:0;text-align:center;font-family:'Noto Sans KR',sans-serif;"></div>
+      <div style="background:var(--bg);border-radius:var(--r-sm);padding:6px 4px;text-align:center;"><div style="font-size:9px;color:var(--text3);">걸음</div><input type="number" id="inp-steps" placeholder="0" step="100" oninput="autoBurnKcal()" style="border:none;background:none;font-size:13px;font-weight:500;width:100%;padding:0;text-align:center;font-family:'Noto Sans KR',sans-serif;"></div>
+      <div style="background:var(--accent-light);border-radius:var(--r-sm);padding:6px 4px;text-align:center;"><div style="font-size:9px;color:var(--accent);">소모</div><input type="number" id="inp-burn-kcal" placeholder="0" step="10" style="border:none;background:none;font-size:13px;font-weight:500;width:100%;padding:0;text-align:center;font-family:'Noto Sans KR',sans-serif;color:var(--accent);"></div>
+    </div>
+    <!-- 유산소 2 -->
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">유산소 2 (선택)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;" id="cardio-type-row2">
+      <button class="rt-btn" onclick="setCardioType2('수영',this)">🏊</button>
+      <button class="rt-btn" onclick="setCardioType2('홈트',this)">🏠</button>
+      <button class="rt-btn" onclick="setCardioType2('산책/트레킹',this)">🥾</button>
+      <button class="rt-btn" onclick="setCardioType2('러닝',this)">🏃</button>
+      <button class="rt-btn" onclick="setCardioType2('기타',this)">➕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px;">
+      <div style="background:var(--bg);border-radius:var(--r-sm);padding:6px 4px;text-align:center;"><div style="font-size:9px;color:var(--text3);">분</div><input type="number" id="inp-cardio2-min" placeholder="0" step="1" style="border:none;background:none;font-size:13px;font-weight:500;width:100%;padding:0;text-align:center;font-family:'Noto Sans KR',sans-serif;"></div>
+      <div style="background:var(--bg);border-radius:var(--r-sm);padding:6px 4px;text-align:center;"><div style="font-size:9px;color:var(--text3);">심박</div><input type="number" id="inp-cardio2-hr" placeholder="0" step="1" style="border:none;background:none;font-size:13px;font-weight:500;width:100%;padding:0;text-align:center;font-family:'Noto Sans KR',sans-serif;"></div>
+      <div style="background:var(--bg);border-radius:var(--r-sm);padding:6px 4px;text-align:center;"><div style="font-size:9px;color:var(--text3);">kcal</div><input type="number" id="inp-cardio2-kcal" placeholder="0" step="1" oninput="autoBurnKcal()" style="border:none;background:none;font-size:13px;font-weight:500;width:100%;padding:0;text-align:center;font-family:'Noto Sans KR',sans-serif;"></div>
     </div>
   </div>
   <div class="field">
-    <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px;font-weight:500;">근력 <span style="font-weight:400;color:var(--text3);">— 플랜핏 결과 그대로 붙여넣으면 자동 정리</span></label>
-    <textarea id="inp-strength" placeholder="붙여넣기하면 자동으로 정리됩니다" style="min-height:90px;font-size:13px;" onpaste="parsePlanfit(event)" oninput="autoBurnKcal()"></textarea>
+    <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px;font-weight:500;">근력 <span style="font-weight:400;color:var(--text3);">— 플랜핏 결과 붙여넣기</span></label>
+    <textarea id="inp-strength" placeholder="붙여넣기하면 자동으로 정리됩니다" style="min-height:80px;font-size:13px;" onpaste="parsePlanfit(event)" oninput="autoBurnKcal()"></textarea>
   </div>
 
   <div class="sec-label">독서</div>
@@ -321,10 +334,9 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
     <input type="number" id="inp-snack-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()" style="width:60px;padding:9px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
     <input type="number" id="inp-snack-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()" style="width:60px;padding:9px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;">
-    <div class="stat-box"><label>총 칼로리</label><input type="number" id="inp-intake-kcal" placeholder="0" step="10" readonly style="background:var(--bg);"></div>
-    <div class="stat-box"><label>단백질 g</label><input type="number" id="inp-intake-protein" placeholder="0" step="1" readonly style="background:var(--bg);"></div>
-    <div class="stat-box"><label>소모 kcal</label><input type="number" id="inp-burn-kcal" placeholder="0" step="10"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px;">
+    <div style="background:var(--bg);border-radius:var(--r-sm);padding:7px 10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:2px;">총 칼로리</div><input type="number" id="inp-intake-kcal" placeholder="0" step="10" readonly style="border:none;background:none;font-size:14px;font-weight:500;width:100%;padding:0;font-family:'Noto Sans KR',sans-serif;"></div>
+    <div style="background:var(--bg);border-radius:var(--r-sm);padding:7px 10px;"><div style="font-size:10px;color:var(--text3);margin-bottom:2px;">단백질 g</div><input type="number" id="inp-intake-protein" placeholder="0" step="1" readonly style="border:none;background:none;font-size:14px;font-weight:500;width:100%;padding:0;font-family:'Noto Sans KR',sans-serif;"></div>
   </div>
 
   <div class="field"><textarea id="inp-text" placeholder="오늘 있었던 일, 생각, 느낌..."></textarea></div>
@@ -454,16 +466,27 @@ function getMealText(key){
   return mealTags[key].join(', ');
 }
 
+let selectedCardioType2='';
+function setCardioType2(type, el){
+  if(selectedCardioType2===type){
+    selectedCardioType2='';
+    el.classList.remove('done');
+  } else {
+    selectedCardioType2=type;
+    document.querySelectorAll('#cardio-type-row2 .rt-btn').forEach(b=>b.classList.remove('done'));
+    el.classList.add('done');
+  }
+}
+
 function autoBurnKcal(){
   const cardioKcal=parseFloat(document.getElementById('inp-cardio-kcal').value)||0;
+  const cardio2Kcal=parseFloat(document.getElementById('inp-cardio2-kcal')?.value)||0;
   const strengthText=document.getElementById('inp-strength').value||'';
   const steps=parseFloat(document.getElementById('inp-steps').value)||0;
-  // 근력운동 텍스트에서 kcal 숫자 추출 (예: "118 kcal" 또는 "242 kcal")
   const matches=[...strengthText.matchAll(/(\d+)\s*kcal/gi)];
   const strengthKcal=matches.length>0?parseFloat(matches[matches.length-1][1]):0;
-  // 걸음수 칼로리 (걸음수 × 0.04 kcal)
   const stepsKcal=Math.round(steps*0.04);
-  const total=cardioKcal+strengthKcal+stepsKcal;
+  const total=cardioKcal+cardio2Kcal+strengthKcal+stepsKcal;
   if(total>0) document.getElementById('inp-burn-kcal').value=total;
 }
 
@@ -673,6 +696,7 @@ const ROUTINE_GROUPS=[
   ]},
   {id:'content', label:'콘텐츠', items:[
     {id:'blog',label:'✍️ 블로그'},
+    {id:'write',label:'📝 글쓰기'},
     {id:'sns',label:'📱 SNS'},
     {id:'stock',label:'🖼️ 어스톡'},
   ]},
@@ -1022,6 +1046,12 @@ function openModal(id){
   document.getElementById('inp-cardio-hr').value='';
   document.getElementById('inp-cardio-kcal').value='';
   document.getElementById('inp-steps').value='';
+  selectedCardioType2='';
+  document.querySelectorAll('#cardio-type-row2 .rt-btn').forEach(b=>b.classList.remove('done'));
+  const c2m=document.getElementById('inp-cardio2-min');
+  const c2h=document.getElementById('inp-cardio2-hr');
+  const c2k=document.getElementById('inp-cardio2-kcal');
+  if(c2m)c2m.value='';if(c2h)c2h.value='';if(c2k)c2k.value='';
   document.getElementById('inp-cardio-type-custom').value='';
   document.getElementById('inp-cardio-type-custom').style.display='none';
   selectedCardioType='';
@@ -1174,6 +1204,11 @@ function saveEntry(){
     cardioMin:document.getElementById('inp-cardio-min').value,
     cardioHr:document.getElementById('inp-cardio-hr').value,
     cardioKcal:document.getElementById('inp-cardio-kcal').value,
+    cardio2Type:selectedCardioType2,
+    cardio2Min:document.getElementById('inp-cardio2-min')?.value||'',
+    cardio2Hr:document.getElementById('inp-cardio2-hr')?.value||'',
+    cardio2Kcal:document.getElementById('inp-cardio2-kcal')?.value||'',
+    burnKcal:document.getElementById('inp-burn-kcal').value,
     steps:document.getElementById('inp-steps').value,
     strength:document.getElementById('inp-strength').value,
     bookIds:[...selectedBookIds],
