@@ -266,13 +266,13 @@ input[type=number]{-moz-appearance:textfield;}
     </div>
     <input type="text" id="inp-cardio-type-custom" placeholder="직접 입력" style="display:none;width:100%;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);margin-bottom:8px;">
     <div style="display:flex;gap:4px;margin-bottom:4px;">
-      <input type="text" inputmode="numeric" id="inp-cardio-min" placeholder="분" oninput="autoBurnKcal()" style="flex:1;padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
-      <input type="text" inputmode="numeric" id="inp-cardio-hr" placeholder="심박" style="flex:1;padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
-      <input type="text" inputmode="numeric" id="inp-cardio-kcal" placeholder="kcal" oninput="autoBurnKcal()" style="flex:1;padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
+      <input type="text" inputmode="numeric" id="inp-cardio-min" placeholder="분" oninput="autoBurnKcal()" style="flex:1;min-width:0;padding:7px 2px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
+      <input type="text" inputmode="numeric" id="inp-cardio-hr" placeholder="심박" style="flex:1;min-width:0;padding:7px 2px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
+      <input type="text" inputmode="numeric" id="inp-cardio-kcal" placeholder="kcal" oninput="autoBurnKcal()" style="flex:1;min-width:0;padding:7px 2px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
     </div>
     <div style="display:flex;gap:4px;margin-bottom:6px;">
-      <input type="text" inputmode="numeric" id="inp-steps" placeholder="걸음수" oninput="autoBurnKcal()" style="flex:2;padding:7px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
-      <input type="text" inputmode="numeric" id="inp-burn-kcal" placeholder="🔥 소모 kcal" style="flex:2;padding:7px 6px;border:1px solid var(--accent-light);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--accent-light);color:var(--accent);">
+      <input type="text" inputmode="numeric" id="inp-steps" placeholder="걸음수" oninput="autoBurnKcal()" style="flex:1;min-width:0;padding:7px 2px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
+      <input type="text" inputmode="numeric" id="inp-burn-kcal" placeholder="🔥 소모" style="flex:1;min-width:0;padding:7px 2px;border:1px solid var(--accent-light);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--accent-light);color:var(--accent);">
     </div>
     <!-- 유산소 2 - 기본 숨김 -->
     <div id="cardio2-section" style="display:none;">
