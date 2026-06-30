@@ -263,12 +263,14 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
       <button class="rt-btn" onclick="setCardioType('기타',this)">➕ 기타</button>
     </div>
     <input type="text" id="inp-cardio-type-custom" placeholder="직접 입력" style="display:none;width:100%;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);margin-bottom:8px;">
-    <div style="display:flex;gap:4px;margin-bottom:6px;">
+    <div style="display:flex;gap:4px;margin-bottom:4px;">
       <input type="number" id="inp-cardio-min" placeholder="분" step="1" oninput="autoBurnKcal()" style="flex:1;padding:7px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
       <input type="number" id="inp-cardio-hr" placeholder="심박" step="1" style="flex:1;padding:7px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
       <input type="number" id="inp-cardio-kcal" placeholder="kcal" step="1" oninput="autoBurnKcal()" style="flex:1;padding:7px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
-      <input type="number" id="inp-steps" placeholder="걸음" step="100" oninput="autoBurnKcal()" style="flex:1;padding:7px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
-      <input type="number" id="inp-burn-kcal" placeholder="소모" step="10" style="flex:1;padding:7px 6px;border:1px solid var(--accent-light);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--accent-light);color:var(--accent);">
+    </div>
+    <div style="display:flex;gap:4px;margin-bottom:6px;">
+      <input type="number" id="inp-steps" placeholder="걸음수" step="100" oninput="autoBurnKcal()" style="flex:2;padding:7px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
+      <input type="number" id="inp-burn-kcal" placeholder="🔥 소모 kcal" step="10" style="flex:2;padding:7px 6px;border:1px solid var(--accent-light);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--accent-light);color:var(--accent);">
     </div>
     <!-- 유산소 2 - 기본 숨김 -->
     <div id="cardio2-section" style="display:none;">
@@ -311,47 +313,30 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
   </div>
 
   <div class="sec-label">🍽 식단</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
-    <div style="font-size:10px;color:var(--text3);text-align:right;padding-right:2px;">kcal / 단백질g</div>
-    <div style="font-size:10px;color:var(--text3);text-align:right;padding-right:2px;">kcal / 단백질g</div>
+  <div style="display:grid;grid-template-columns:1fr 52px 52px;gap:4px;margin-bottom:4px;align-items:center;">
+    <div></div>
+    <div style="font-size:10px;color:var(--text3);text-align:center;">kcal</div>
+    <div style="font-size:10px;color:var(--text3);text-align:center;">단백질</div>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-    <!-- 아침 -->
-    <div style="border:1px solid var(--border2);border-radius:var(--r-sm);padding:6px 8px;background:var(--bg);">
-      <input type="text" id="inp-breakfast" placeholder="🌅 아침" style="width:100%;border:none;background:none;font-size:12px;font-family:'Noto Sans KR',sans-serif;margin-bottom:4px;outline:none;">
-      <div style="display:flex;gap:4px;">
-        <input type="number" id="inp-breakfast-kcal" placeholder="kcal" step="10" oninput="calculateIntakeKcal()" style="flex:1;border:none;background:none;font-size:12px;text-align:center;outline:none;min-width:0;">
-        <span style="color:var(--border2);">/</span>
-        <input type="number" id="inp-breakfast-protein" placeholder="단백질" step="1" oninput="calculateIntakeKcal()" style="flex:1;border:none;background:none;font-size:12px;text-align:center;outline:none;min-width:0;">
-      </div>
-    </div>
-    <!-- 점심 -->
-    <div style="border:1px solid var(--border2);border-radius:var(--r-sm);padding:6px 8px;background:var(--bg);">
-      <input type="text" id="inp-lunch" placeholder="🍽 점심" style="width:100%;border:none;background:none;font-size:12px;font-family:'Noto Sans KR',sans-serif;margin-bottom:4px;outline:none;">
-      <div style="display:flex;gap:4px;">
-        <input type="number" id="inp-lunch-kcal" placeholder="kcal" step="10" oninput="calculateIntakeKcal()" style="flex:1;border:none;background:none;font-size:12px;text-align:center;outline:none;min-width:0;">
-        <span style="color:var(--border2);">/</span>
-        <input type="number" id="inp-lunch-protein" placeholder="단백질" step="1" oninput="calculateIntakeKcal()" style="flex:1;border:none;background:none;font-size:12px;text-align:center;outline:none;min-width:0;">
-      </div>
-    </div>
-    <!-- 저녁 -->
-    <div style="border:1px solid var(--border2);border-radius:var(--r-sm);padding:6px 8px;background:var(--bg);">
-      <input type="text" id="inp-dinner" placeholder="🌙 저녁" style="width:100%;border:none;background:none;font-size:12px;font-family:'Noto Sans KR',sans-serif;margin-bottom:4px;outline:none;">
-      <div style="display:flex;gap:4px;">
-        <input type="number" id="inp-dinner-kcal" placeholder="kcal" step="10" oninput="calculateIntakeKcal()" style="flex:1;border:none;background:none;font-size:12px;text-align:center;outline:none;min-width:0;">
-        <span style="color:var(--border2);">/</span>
-        <input type="number" id="inp-dinner-protein" placeholder="단백질" step="1" oninput="calculateIntakeKcal()" style="flex:1;border:none;background:none;font-size:12px;text-align:center;outline:none;min-width:0;">
-      </div>
-    </div>
-    <!-- 간식 -->
-    <div style="border:1px solid var(--border2);border-radius:var(--r-sm);padding:6px 8px;background:var(--bg);">
-      <input type="text" id="inp-snack" placeholder="🍬 간식" style="width:100%;border:none;background:none;font-size:12px;font-family:'Noto Sans KR',sans-serif;margin-bottom:4px;outline:none;">
-      <div style="display:flex;gap:4px;">
-        <input type="number" id="inp-snack-kcal" placeholder="kcal" step="10" oninput="calculateIntakeKcal()" style="flex:1;border:none;background:none;font-size:12px;text-align:center;outline:none;min-width:0;">
-        <span style="color:var(--border2);">/</span>
-        <input type="number" id="inp-snack-protein" placeholder="단백질" step="1" oninput="calculateIntakeKcal()" style="flex:1;border:none;background:none;font-size:12px;text-align:center;outline:none;min-width:0;">
-      </div>
-    </div>
+  <div style="display:grid;grid-template-columns:1fr 52px 52px;gap:4px;margin-bottom:4px;">
+    <input type="text" id="inp-breakfast" placeholder="🌅 아침" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+    <input type="number" id="inp-breakfast-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
+    <input type="number" id="inp-breakfast-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 52px 52px;gap:4px;margin-bottom:4px;">
+    <input type="text" id="inp-lunch" placeholder="🍽 점심" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+    <input type="number" id="inp-lunch-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
+    <input type="number" id="inp-lunch-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 52px 52px;gap:4px;margin-bottom:4px;">
+    <input type="text" id="inp-dinner" placeholder="🌙 저녁" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+    <input type="number" id="inp-dinner-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
+    <input type="number" id="inp-dinner-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 52px 52px;gap:4px;margin-bottom:8px;">
+    <input type="text" id="inp-snack" placeholder="🍬 간식" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+    <input type="number" id="inp-snack-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
+    <input type="number" id="inp-snack-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
   </div>
   <div style="display:flex;gap:6px;margin-bottom:12px;">
     <input type="number" id="inp-intake-kcal" placeholder="총 칼로리" readonly style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
