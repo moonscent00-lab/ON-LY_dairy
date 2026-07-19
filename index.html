@@ -888,9 +888,10 @@ function saveNewBook(){
 }
 
 function finishBook(id){
-  if(!confirm('완독으로 표시할까요?'))return;
+  const dateInput=prompt('완독일을 입력해주세요 (YYYY-MM-DD)', new Date().toISOString().slice(0,10));
+  if(!dateInput)return;
   const b=books.find(x=>x.id===id);
-  if(b){b.status='done';b.endDate=new Date().toISOString().slice(0,10);}
+  if(b){b.status='done';b.endDate=dateInput;}
   selectedBookIds.delete(id);
   saveBooks();buildBookSelectArea();
 }
