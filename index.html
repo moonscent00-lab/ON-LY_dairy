@@ -117,11 +117,11 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
 .stats-big{font-size:11px;color:var(--text3);margin-bottom:3px;}
 .stats-num{font-family:'Noto Serif KR',serif;font-size:32px;font-weight:600;}
 .stats-change{font-size:12px;margin-top:2px;}
-.stats-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.stats-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:14px;}
-.stats-card-lbl{font-size:11px;color:var(--text3);margin-bottom:5px;}
-.stats-card-val{font-size:22px;font-weight:500;}
-.stats-card-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+.stats-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
+.stats-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:10px;}
+.stats-card-lbl{font-size:10px;color:var(--text3);margin-bottom:4px;}
+.stats-card-val{font-size:18px;font-weight:500;}
+.stats-card-sub{font-size:10px;color:var(--text3);margin-top:2px;}
 .chart-box{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:14px;margin-bottom:12px;}
 .chart-title{font-size:12px;color:var(--text2);font-weight:500;margin-bottom:10px;}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
@@ -315,35 +315,18 @@ input[type=number]{-moz-appearance:textfield;}
   </div>
 
   <div class="sec-label">🍽 식단</div>
-  <div style="display:grid;grid-template-columns:1fr 52px 52px;gap:4px;margin-bottom:4px;align-items:center;">
-    <div></div>
-    <div style="font-size:10px;color:var(--text3);text-align:center;">kcal</div>
-    <div style="font-size:10px;color:var(--text3);text-align:center;">단백질</div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 52px 52px;gap:4px;margin-bottom:4px;">
+  <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;">
     <input type="text" id="inp-breakfast" placeholder="🌅 아침" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-    <input type="number" id="inp-breakfast-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-    <input type="number" id="inp-breakfast-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 52px 52px;gap:4px;margin-bottom:4px;">
     <input type="text" id="inp-lunch" placeholder="🍽 점심" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-    <input type="number" id="inp-lunch-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-    <input type="number" id="inp-lunch-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 52px 52px;gap:4px;margin-bottom:4px;">
     <input type="text" id="inp-dinner" placeholder="🌙 저녁" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-    <input type="number" id="inp-dinner-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-    <input type="number" id="inp-dinner-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 52px 52px;gap:4px;margin-bottom:8px;">
     <input type="text" id="inp-snack" placeholder="🍬 간식" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-    <input type="number" id="inp-snack-kcal" placeholder="0" step="10" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-    <input type="number" id="inp-snack-protein" placeholder="0" step="1" oninput="calculateIntakeKcal()" style="padding:7px 4px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
   </div>
-  <div style="display:flex;gap:6px;margin-bottom:12px;">
-    <input type="number" id="inp-intake-kcal" placeholder="총 칼로리" readonly style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
-    <input type="number" id="inp-intake-protein" placeholder="총 단백질g" readonly style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
-  </div>
+  <!-- 숨겨진 칼로리/단백질 필드 (Supabase 호환용) -->
+  <input type="hidden" id="inp-breakfast-kcal"><input type="hidden" id="inp-breakfast-protein">
+  <input type="hidden" id="inp-lunch-kcal"><input type="hidden" id="inp-lunch-protein">
+  <input type="hidden" id="inp-dinner-kcal"><input type="hidden" id="inp-dinner-protein">
+  <input type="hidden" id="inp-snack-kcal"><input type="hidden" id="inp-snack-protein">
+  <input type="hidden" id="inp-intake-kcal"><input type="hidden" id="inp-intake-protein">
 
   <div class="field"><textarea id="inp-text" placeholder="오늘 있었던 일, 생각, 느낌..."></textarea></div>
 
@@ -1551,25 +1534,97 @@ function renderStats(){
     </div>
     <div class="stats-cards">
       <div class="stats-card">
-        <div class="stats-card-lbl">체지방률</div>
-        <div class="stats-card-val">${latestFat?latestFat.toFixed(1)+'<span style="font-size:12px"> %</span>':'—'}</div>
-        ${fatChange?`<div class="stats-card-sub" style="color:${fatChange>0?'var(--danger)':'var(--accent)'}">${fatChange>0?'+':''}${fatChange}%</div>`:''}
+        <div class="stats-card-lbl">체중</div>
+        <div class="stats-card-val">${entries.filter(e=>e.weight).length?parseFloat(entries.filter(e=>e.weight).slice(-1)[0].weight).toFixed(1)+'<span style="font-size:11px"> kg</span>':'—'}</div>
       </div>
       <div class="stats-card">
         <div class="stats-card-lbl">골격근량</div>
-        <div class="stats-card-val">${latestMuscle?latestMuscle.toFixed(1)+'<span style="font-size:12px"> kg</span>':'—'}</div>
-        ${muscleChange?`<div class="stats-card-sub" style="color:${muscleChange>0?'var(--accent)':'var(--danger)'}">${muscleChange>0?'+':''}${muscleChange}kg</div>`:''}
+        <div class="stats-card-val">${latestMuscle?latestMuscle.toFixed(1)+'<span style="font-size:11px"> kg</span>':'—'}</div>
+        ${muscleChange?`<div class="stats-card-sub" style="color:${muscleChange>0?'var(--accent)':'var(--danger)'}">${muscleChange>0?'+':''}${muscleChange}</div>`:''}
       </div>
-      <div class="stats-card"><div class="stats-card-lbl">기록일</div><div class="stats-card-val">${sorted.length}<span style="font-size:12px"> 일</span></div></div>
-      <div class="stats-card"><div class="stats-card-lbl">운동한 날</div><div class="stats-card-val">${exerciseDays}<span style="font-size:12px"> 일</span></div><div class="stats-card-sub">${sorted.length?Math.round(exerciseDays/sorted.length*100):0}%</div></div>
-      <div class="stats-card"><div class="stats-card-lbl">독서한 날</div><div class="stats-card-val">${bookDays}<span style="font-size:12px"> 일</span></div><div class="stats-card-sub">${sorted.length?Math.round(bookDays/sorted.length*100):0}%</div></div>
-      <div class="stats-card"><div class="stats-card-lbl">단백질 달성</div><div class="stats-card-val">${proteinAll?Math.round(proteinO/proteinAll*100):'—'}<span style="font-size:12px"> %</span></div><div class="stats-card-sub">${proteinO}/${proteinAll}일</div></div>
+      <div class="stats-card">
+        <div class="stats-card-lbl">체지방률</div>
+        <div class="stats-card-val">${latestFat?latestFat.toFixed(1)+'<span style="font-size:11px"> %</span>':'—'}</div>
+        ${fatChange?`<div class="stats-card-sub" style="color:${fatChange>0?'var(--danger)':'var(--accent)'}">${fatChange>0?'+':''}${fatChange}%</div>`:''}
+      </div>
     </div>
+
+    ${activityGrid(sorted, statsPeriod)}
+
     ${fatEntries.length>1?`<div class="chart-box"><div class="chart-title">📉 체지방률 추이</div>${lineChart(fatEntries,'fat','%','var(--danger)')}</div>`:''}
     ${muscleEntries.length>1?`<div class="chart-box"><div class="chart-title">💪 골격근량 추이</div>${lineChart(muscleEntries,'muscle','kg','var(--accent)')}</div>`:''}
     ${weightEntries.length>1?`<div class="chart-box"><div class="chart-title">⚖️ 체중 추이</div>${lineChart(weightEntries,'weight','kg','var(--info)')}</div>`:''}
     ${routineStats.length?`<div class="chart-box"><div class="chart-title">✅ 루틴 달성률</div>${routineStats.map(r=>`<div class="routine-stat-row"><div class="routine-stat-name">${r.label}</div><div class="routine-stat-bar"><div class="routine-stat-fill" style="width:${r.pct}%"></div></div><div class="routine-stat-pct">${r.pct}%</div></div>`).join('')}</div>`:''}
   `;
+}
+
+function activityGrid(sorted, period){
+  if(!sorted.length) return '';
+  const entryMap={};
+  sorted.forEach(e=>entryMap[e.date]=e);
+  const WDAYS=['S','M','T','W','T','F','S'];
+
+  if(period===7){
+    // 7일: 날짜별 O/X 표시
+    const days=[];
+    for(let i=6;i>=0;i--){
+      const d=new Date(today);
+      d.setDate(d.getDate()-i);
+      days.push(d.toISOString().slice(0,10));
+    }
+    const exerciseRow=days.map(d=>{
+      const e=entryMap[d];
+      const has=e&&(e.cardioType||e.strength||e.cardio2Type);
+      return`<div style="text-align:center;font-size:13px;color:${has?'var(--accent)':'var(--text3)'};">${has?'●':'○'}</div>`;
+    }).join('');
+    const bookRow=days.map(d=>{
+      const e=entryMap[d];
+      const has=e&&e.bookIds&&e.bookIds.length;
+      return`<div style="text-align:center;font-size:13px;color:${has?'var(--purple)':'var(--text3)'};">${has?'●':'○'}</div>`;
+    }).join('');
+    const dateRow=days.map(d=>{
+      const dt=new Date(d+'T00:00:00');
+      return`<div style="text-align:center;font-size:10px;color:var(--text3);">${dt.getDate()}<br><span style="font-size:9px;">${WDAYS[dt.getDay()]}</span></div>`;
+    }).join('');
+
+    return`<div class="chart-box" style="margin-bottom:12px;">
+      <div style="display:grid;grid-template-columns:40px repeat(7,1fr);gap:4px;align-items:center;">
+        <div></div>${dateRow}
+        <div style="font-size:10px;color:var(--accent);font-weight:500;">운동</div>${exerciseRow}
+        <div style="font-size:10px;color:var(--purple);font-weight:500;">독서</div>${bookRow}
+      </div>
+    </div>`;
+  } else {
+    // 30일/90일/전체: 점으로 표시 + 퍼센트
+    const exerciseDays=sorted.filter(e=>e.cardioType||e.strength||e.cardio2Type).length;
+    const bookDays=sorted.filter(e=>e.bookIds&&e.bookIds.length).length;
+    const total=sorted.length;
+
+    const dots=(arr, color)=>arr.map(e=>{
+      const has=e;
+      return`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${has?color:'var(--border2)'};margin:1px;"></span>`;
+    }).join('');
+
+    const exDots=sorted.map(e=>e.cardioType||e.strength||e.cardio2Type?1:0);
+    const bkDots=sorted.map(e=>e.bookIds&&e.bookIds.length?1:0);
+
+    return`<div class="chart-box" style="margin-bottom:12px;">
+      <div style="margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:11px;color:var(--accent);font-weight:500;">🏃 운동</span>
+          <span style="font-size:11px;color:var(--text2);">${exerciseDays}/${total}일 <strong>${total?Math.round(exerciseDays/total*100):0}%</strong></span>
+        </div>
+        <div style="line-height:1;">${exDots.map((v,i)=>`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${v?'var(--accent)':'var(--border2)'};margin:1px;"></span>`).join('')}</div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:11px;color:var(--purple);font-weight:500;">📖 독서</span>
+          <span style="font-size:11px;color:var(--text2);">${bookDays}/${total}일 <strong>${total?Math.round(bookDays/total*100):0}%</strong></span>
+        </div>
+        <div style="line-height:1;">${bkDots.map((v,i)=>`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${v?'var(--purple)':'var(--border2)'};margin:1px;"></span>`).join('')}</div>
+      </div>
+    </div>`;
+  }
 }
 
 function lineChart(data, key, unit, color){
