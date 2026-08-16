@@ -158,6 +158,50 @@ input[type=number]{-moz-appearance:textfield;}
 .autocomplete-item{padding:10px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);color:var(--text);}
 .autocomplete-item:hover{background:var(--accent-light);color:var(--accent);}
 .autocomplete-item:last-child{border-bottom:none;}
+
+/* TIMER TAB */
+.timer-hero{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:24px 18px;text-align:center;margin-bottom:16px;}
+.timer-elapsed{font-family:'Noto Serif KR',serif;font-size:38px;font-weight:600;margin:10px 0 18px;}
+.timer-cat-badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:13px;color:#fff;margin-bottom:6px;}
+.timer-btn-stop{width:100%;padding:16px;border-radius:var(--r-sm);border:none;font-size:16px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:var(--danger);color:#fff;}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.cat-btn{padding:16px 6px;border-radius:var(--r-sm);border:1.5px solid var(--border2);background:var(--bg);font-size:13px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.timeline-day{margin-bottom:14px;}
+.timeline-date{font-size:12px;color:var(--text2);font-weight:500;margin-bottom:8px;}
+.timeline-block{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border);margin-bottom:6px;}
+.timeline-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.timeline-info{flex:1;font-size:12px;}
+.timeline-cat{font-weight:500;}
+.timeline-time{color:var(--text3);font-size:11px;margin-top:1px;}
+.timeline-dur{font-size:12px;font-weight:600;color:var(--text2);white-space:nowrap;}
+.cat-manage-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+
+/* TASKS TAB */
+.task-filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;}
+.task-filter-chip{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;flex-shrink:0;}
+.task-filter-chip.on{color:#fff;border-color:transparent;}
+.task-add-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:14px;margin-bottom:16px;}
+.task-add-row{display:flex;gap:6px;margin-bottom:8px;}
+.task-add-row:last-child{margin-bottom:0;}
+.priority-btn{flex:1;padding:7px 4px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--bg);font-size:12px;color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.priority-btn.on-high{background:#fce8e8;color:var(--danger);border-color:var(--danger);}
+.priority-btn.on-mid{background:#fff1e3;color:var(--accent2);border-color:var(--accent2);}
+.priority-btn.on-low{background:var(--bg);color:var(--text2);border-color:var(--border2);font-weight:600;}
+.pipeline-select-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
+.pipeline-select-btn{padding:5px 10px;border-radius:20px;font-size:11px;border:1.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.pipeline-select-btn.on{color:#fff;border-color:transparent;}
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:12px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border);margin-bottom:8px;}
+.task-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;cursor:pointer;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;background:none;}
+.task-check.done{background:var(--accent);border-color:var(--accent);color:#fff;}
+.task-body{flex:1;min-width:0;}
+.task-title{font-size:14px;color:var(--text);word-break:break-word;}
+.task-title.done{color:var(--text3);text-decoration:line-through;}
+.task-meta{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap;align-items:center;}
+.task-pipeline-tag{font-size:10px;padding:2px 8px;border-radius:20px;color:#fff;}
+.task-due{font-size:11px;color:var(--text3);}
+.task-due.overdue{color:var(--danger);font-weight:500;}
+.task-priority-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.task-del{border:none;background:none;color:var(--text3);font-size:16px;cursor:pointer;padding:2px 4px;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -167,13 +211,15 @@ input[type=number]{-moz-appearance:textfield;}
     <div class="nav-today" id="nav-today"></div>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab on" onclick="showTab('diary',this)">다이어리</button>
+    <button class="nav-tab on" onclick="showTab('timer',this)">⏱ 타임</button>
+    <button class="nav-tab" onclick="showTab('diary',this)">다이어리</button>
+    <button class="nav-tab" onclick="showTab('tasks',this)">📋 업무</button>
     <button class="nav-tab" onclick="showTab('stats',this)">통계</button>
     <button class="nav-tab" onclick="showTab('settings',this)">설정</button>
   </div>
 </div>
 
-<div class="main" id="main-diary">
+<div class="main" id="main-diary" style="display:none">
   <!-- 검색바 -->
   <div style="display:flex;gap:8px;margin-bottom:14px;">
     <div style="flex:1;position:relative;">
@@ -203,6 +249,8 @@ input[type=number]{-moz-appearance:textfield;}
 
   <div id="entries-list"></div>
 </div>
+<div class="main" id="main-timer"><div id="timer-content"></div></div>
+<div class="main" id="main-tasks" style="display:none"><div id="tasks-content"></div></div>
 <div class="main" id="main-stats" style="display:none">
   <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
     <button onclick="captureStats()" style="padding:7px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📸 이미지로 저장</button>
@@ -211,7 +259,7 @@ input[type=number]{-moz-appearance:textfield;}
 </div>
 <div class="main" id="main-settings" style="display:none"><div id="settings-content"></div></div>
 
-<button class="fab" id="fab-btn" onclick="openModal()" aria-label="새 일기">+</button>
+<button class="fab" id="fab-btn" onclick="openModal()" aria-label="새 일기" style="display:none">+</button>
 
 <!-- WRITE MODAL -->
 <div class="modal-bg" id="write-modal" style="display:none">
@@ -799,7 +847,7 @@ function buildBookSelectArea(){
           <div style="font-size:13px;font-weight:500;color:${on?'var(--purple)':'var(--text)'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(b.title)}</div>
           ${b.author?`<div style="font-size:11px;color:var(--text3);">${esc(b.author)}</div>`:''}
         </div>
-        <button onclick="event.stopPropagation();finishBook('${b.id}')" style="font-size:10px;padding:3px 7px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text3);cursor:pointer;flex-shrink:0;">완독</button>
+        <button onclick="event.stopPropagation();" style="display:none;">완독</button>
       </div>`;
     });
     html+=`</div>`;
@@ -972,6 +1020,446 @@ async function loadFromSheets(){
   }
 }
 
+/* ── 스톱워치 (타임) ── */
+const DEFAULT_CATEGORIES=[
+  {name:'독서',color:'#7B5EA7'},
+  {name:'이동',color:'#457B9D'},
+  {name:'운동',color:'#2D6A4F'},
+  {name:'공부',color:'#E76F51'},
+  {name:'업무',color:'#E9C46A'},
+  {name:'휴식',color:'#A8A39A'}
+];
+const CAT_PALETTE=['#7B5EA7','#457B9D','#2D6A4F','#E76F51','#E9C46A','#A8A39A','#E63946','#F4A261','#264653','#8AB17D'];
+let categories=[];
+let activeSession=null;
+let timerTickInterval=null;
+
+async function loadCategories(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_categories?order=created_at.asc`,{
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    if(res.ok){
+      const data=await res.json();
+      if(data&&data.length>0){
+        categories=data.map(c=>({id:c.id,name:c.name,color:c.color}));
+        return;
+      }
+    }
+  }catch(e){}
+  // 처음 실행: 기본 카테고리 시드
+  categories=[];
+  for(const c of DEFAULT_CATEGORIES){
+    const id=genId();
+    categories.push({id,name:c.name,color:c.color});
+    try{
+      await fetch(`${SUPABASE_URL}/rest/v1/time_categories`,{
+        method:'POST',
+        headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+        body:JSON.stringify({id,name:c.name,color:c.color,created_at:new Date().toISOString()})
+      });
+    }catch(e){}
+  }
+}
+
+async function addCategory(name){
+  name=(name||'').trim();
+  if(!name)return;
+  if(categories.some(c=>c.name===name)){showToast('이미 있는 카테고리예요',true);return;}
+  const color=CAT_PALETTE[categories.length%CAT_PALETTE.length];
+  const id=genId();
+  categories.push({id,name,color});
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/time_categories`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({id,name,color,created_at:new Date().toISOString()})
+    });
+    showToast('✅ 카테고리 추가됨');
+  }catch(e){showToast('⚠️ 동기화 실패',true);}
+  renderSettings();
+}
+
+async function deleteCategory(id){
+  if(!confirm('이 카테고리를 삭제할까요?'))return;
+  categories=categories.filter(c=>c.id!==id);
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/time_categories?id=eq.${id}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+  }catch(e){}
+  renderSettings();
+}
+
+async function loadActiveSession(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_sessions?end_time=is.null&order=start_time.desc&limit=1`,{
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    if(res.ok){
+      const data=await res.json();
+      if(data&&data.length>0){
+        activeSession={id:data[0].id,categoryId:data[0].category_id,categoryName:data[0].category_name,startTime:data[0].start_time};
+        return;
+      }
+    }
+  }catch(e){}
+  activeSession=null;
+}
+
+async function loadSessions(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_sessions?end_time=not.is.null&order=start_time.desc&limit=150`,{
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    if(res.ok) return await res.json();
+  }catch(e){}
+  return [];
+}
+
+async function startSession(catId){
+  const cat=categories.find(c=>c.id===catId);
+  if(!cat)return;
+  const id=genId();
+  const startTime=new Date().toISOString();
+  activeSession={id,categoryId:cat.id,categoryName:cat.name,startTime};
+  renderTimerTab();
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/time_sessions`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({id,category_id:cat.id,category_name:cat.name,start_time:startTime,end_time:null,duration_min:null,date:startTime.slice(0,10)})
+    });
+    showToast('▶️ '+cat.name+' 시작');
+  }catch(e){showToast('⚠️ 저장 실패',true);}
+}
+
+async function endSession(){
+  if(!activeSession)return;
+  const endTime=new Date().toISOString();
+  const durMin=Math.max(1,Math.round((new Date(endTime)-new Date(activeSession.startTime))/60000));
+  const sessionId=activeSession.id;
+  const catName=activeSession.categoryName;
+  activeSession=null;
+  renderTimerTab();
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/time_sessions?id=eq.${sessionId}`,{
+      method:'PATCH',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({end_time:endTime,duration_min:durMin})
+    });
+    showToast('⏹ '+catName+' 종료 · '+durMin+'분');
+  }catch(e){showToast('⚠️ 저장 실패',true);}
+  renderTimerTab();
+}
+
+function formatElapsed(ms){
+  const totalSec=Math.max(0,Math.floor(ms/1000));
+  const h=Math.floor(totalSec/3600);
+  const m=Math.floor((totalSec%3600)/60);
+  const s=totalSec%60;
+  return h>0?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`;
+}
+
+async function renderTimerTab(){
+  const c=document.getElementById('timer-content');
+  if(!c)return;
+  clearInterval(timerTickInterval);
+
+  let heroHtml='';
+  if(activeSession){
+    const cat=categories.find(x=>x.id===activeSession.categoryId);
+    const color=cat?cat.color:'#999';
+    heroHtml=`
+      <div class="timer-hero">
+        <span class="timer-cat-badge" style="background:${color}">${esc(activeSession.categoryName)}</span>
+        <div class="timer-elapsed" id="timer-elapsed-num">0:00</div>
+        <button class="timer-btn-stop" onclick="endSession()">⏹ 종료</button>
+      </div>`;
+  } else {
+    heroHtml=`
+      <div class="timer-hero">
+        <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">카테고리를 탭하면 바로 시작돼요</div>
+        <div class="cat-grid">
+          ${categories.map(cat=>`<button class="cat-btn" style="border-color:${cat.color};color:${cat.color};" onclick="startSession('${cat.id}')">${esc(cat.name)}</button>`).join('')}
+        </div>
+      </div>`;
+  }
+  c.innerHTML=heroHtml+'<div id="timer-timeline" style="text-align:center;color:var(--text3);font-size:13px;padding:20px;">불러오는 중...</div>';
+
+  if(activeSession){
+    const startMs=new Date(activeSession.startTime).getTime();
+    const tick=()=>{
+      const el=document.getElementById('timer-elapsed-num');
+      if(el)el.textContent=formatElapsed(Date.now()-startMs);
+    };
+    tick();
+    timerTickInterval=setInterval(tick,1000);
+  }
+
+  const sessions=await loadSessions();
+  const byDate={};
+  sessions.forEach(s=>{
+    const d=s.date||(s.start_time||'').slice(0,10);
+    if(!byDate[d])byDate[d]=[];
+    byDate[d].push(s);
+  });
+  const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a)).slice(0,14);
+
+  const timelineEl=document.getElementById('timer-timeline');
+  if(!timelineEl)return;
+  if(!dates.length){
+    timelineEl.className='';
+    timelineEl.innerHTML=`<div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-text">아직 기록이 없어요.</div></div>`;
+    return;
+  }
+  timelineEl.className='';
+  timelineEl.innerHTML=dates.map(d=>{
+    const items=byDate[d];
+    const rows=items.map(s=>{
+      const cat=categories.find(x=>x.id===s.category_id);
+      const color=cat?cat.color:'#999';
+      const st=new Date(s.start_time), et=new Date(s.end_time);
+      const stStr=`${String(st.getHours()).padStart(2,'0')}:${String(st.getMinutes()).padStart(2,'0')}`;
+      const etStr=`${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
+      return`<div class="timeline-block">
+        <span class="timeline-dot" style="background:${color}"></span>
+        <div class="timeline-info">
+          <div class="timeline-cat" style="color:${color}">${esc(s.category_name||'')}</div>
+          <div class="timeline-time">${stStr} ~ ${etStr}</div>
+        </div>
+        <div class="timeline-dur">${s.duration_min}분</div>
+      </div>`;
+    }).join('');
+    return`<div class="timeline-day"><div class="timeline-date">${fmtDate(d)} (${getWd(d)})</div>${rows}</div>`;
+  }).join('');
+}
+
+/* ── 업무 (파이프라인별 할일) ── */
+const DEFAULT_PIPELINES=[
+  {name:'애터미',color:'#7B5EA7'},
+  {name:'보험',color:'#457B9D'},
+  {name:'달달샵',color:'#E76F51'},
+  {name:'슈가펫',color:'#2D6A4F'}
+];
+const PIPELINE_PALETTE=['#7B5EA7','#457B9D','#E76F51','#2D6A4F','#E9C46A','#264653','#8AB17D','#E63946'];
+const PRIORITY_LABEL={high:'상',mid:'중',low:'하'};
+const PRIORITY_COLOR={high:'var(--danger)',mid:'var(--accent2)',low:'var(--text3)'};
+const PRIORITY_RANK={high:0,mid:1,low:2};
+
+let pipelines=[];
+let tasks=[];
+let taskFilterPipeline='all';
+let taskAddPriority='mid';
+let taskAddPipelineId='';
+
+async function loadPipelines(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/pipelines?order=created_at.asc`,{
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    if(res.ok){
+      const data=await res.json();
+      if(data&&data.length>0){
+        pipelines=data.map(p=>({id:p.id,name:p.name,color:p.color}));
+        taskAddPipelineId=pipelines[0].id;
+        return;
+      }
+    }
+  }catch(e){}
+  // 처음 실행: 기본 파이프라인 시드
+  pipelines=[];
+  for(const p of DEFAULT_PIPELINES){
+    const id=genId();
+    pipelines.push({id,name:p.name,color:p.color});
+    try{
+      await fetch(`${SUPABASE_URL}/rest/v1/pipelines`,{
+        method:'POST',
+        headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+        body:JSON.stringify({id,name:p.name,color:p.color,created_at:new Date().toISOString()})
+      });
+    }catch(e){}
+  }
+  if(pipelines.length) taskAddPipelineId=pipelines[0].id;
+}
+
+async function addPipeline(name){
+  name=(name||'').trim();
+  if(!name)return;
+  if(pipelines.some(p=>p.name===name)){showToast('이미 있는 파이프라인이에요',true);return;}
+  const color=PIPELINE_PALETTE[pipelines.length%PIPELINE_PALETTE.length];
+  const id=genId();
+  pipelines.push({id,name,color});
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/pipelines`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({id,name,color,created_at:new Date().toISOString()})
+    });
+    showToast('✅ 파이프라인 추가됨');
+  }catch(e){showToast('⚠️ 동기화 실패',true);}
+  renderSettings();
+}
+
+async function deletePipeline(id){
+  if(!confirm('이 파이프라인을 삭제할까요? (연결된 업무는 남아있어요)'))return;
+  pipelines=pipelines.filter(p=>p.id!==id);
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/pipelines?id=eq.${id}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+  }catch(e){}
+  renderSettings();
+}
+
+async function loadTasks(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/tasks?order=created_at.desc&limit=300`,{
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    if(res.ok){ tasks=await res.json(); return; }
+  }catch(e){}
+  tasks=[];
+}
+
+function setTaskAddPriority(p){
+  taskAddPriority=p;
+  renderTasksTab();
+}
+function setTaskAddPipeline(id){
+  taskAddPipelineId=id;
+  renderTasksTab();
+}
+function setTaskFilter(id){
+  taskFilterPipeline=id;
+  renderTasksTab();
+}
+
+async function addTaskFromForm(){
+  const input=document.getElementById('task-title-input');
+  const dueInput=document.getElementById('task-due-input');
+  const title=(input?.value||'').trim();
+  if(!title){showToast('할일 내용을 입력해주세요',true);return;}
+  if(!taskAddPipelineId&&pipelines.length) taskAddPipelineId=pipelines[0].id;
+  const pipeline=pipelines.find(p=>p.id===taskAddPipelineId);
+  const id=genId();
+  const dueDate=dueInput?.value||'';
+  const newTask={
+    id, pipeline_id:taskAddPipelineId, pipeline_name:pipeline?pipeline.name:'',
+    title, due_date:dueDate, priority:taskAddPriority, status:'todo',
+    created_at:new Date().toISOString(), completed_at:null
+  };
+  tasks.unshift(newTask);
+  input.value='';
+  if(dueInput)dueInput.value='';
+  renderTasksTab();
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/tasks`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify(newTask)
+    });
+  }catch(e){showToast('⚠️ 저장 실패',true);}
+}
+
+async function toggleTaskDone(id){
+  const t=tasks.find(x=>x.id===id);
+  if(!t)return;
+  const done=t.status!=='done';
+  t.status=done?'done':'todo';
+  t.completed_at=done?new Date().toISOString():null;
+  renderTasksTab();
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/tasks?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({status:t.status,completed_at:t.completed_at})
+    });
+  }catch(e){}
+}
+
+async function deleteTask(id){
+  if(!confirm('업무를 삭제할까요?'))return;
+  tasks=tasks.filter(t=>t.id!==id);
+  renderTasksTab();
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/tasks?id=eq.${id}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+  }catch(e){}
+}
+
+function renderTasksTab(){
+  const c=document.getElementById('tasks-content');
+  if(!c)return;
+  if(!pipelines.length){
+    c.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">파이프라인을 불러오는 중...</div></div>';
+    return;
+  }
+  const todayStr=today.toISOString().slice(0,10);
+
+  const filterChips=`<div class="task-filter-row">
+    <button class="task-filter-chip ${taskFilterPipeline==='all'?'on':''}" style="${taskFilterPipeline==='all'?'background:var(--text);':''}" onclick="setTaskFilter('all')">전체</button>
+    ${pipelines.map(p=>`<button class="task-filter-chip ${taskFilterPipeline===p.id?'on':''}" style="${taskFilterPipeline===p.id?'background:'+p.color+';':''}" onclick="setTaskFilter('${p.id}')">${esc(p.name)}</button>`).join('')}
+  </div>`;
+
+  const addCard=`<div class="task-add-card">
+    <div class="task-add-row">
+      <input type="text" id="task-title-input" placeholder="할일 입력..." style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+    </div>
+    <div class="pipeline-select-row">
+      ${pipelines.map(p=>`<button class="pipeline-select-btn ${taskAddPipelineId===p.id?'on':''}" style="${taskAddPipelineId===p.id?'background:'+p.color+';':''}" onclick="setTaskAddPipeline('${p.id}')">${esc(p.name)}</button>`).join('')}
+    </div>
+    <div class="task-add-row">
+      <button class="priority-btn ${taskAddPriority==='high'?'on-high':''}" onclick="setTaskAddPriority('high')">🔴 상</button>
+      <button class="priority-btn ${taskAddPriority==='mid'?'on-mid':''}" onclick="setTaskAddPriority('mid')">🟠 중</button>
+      <button class="priority-btn ${taskAddPriority==='low'?'on-low':''}" onclick="setTaskAddPriority('low')">⚪ 하</button>
+    </div>
+    <div class="task-add-row">
+      <input type="date" id="task-due-input" style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+      <button onclick="addTaskFromForm()" style="padding:8px 18px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
+    </div>
+  </div>`;
+
+  let filtered=taskFilterPipeline==='all'?tasks:tasks.filter(t=>t.pipeline_id===taskFilterPipeline);
+  const todo=filtered.filter(t=>t.status!=='done').sort((a,b)=>{
+    const pr=(PRIORITY_RANK[a.priority]??1)-(PRIORITY_RANK[b.priority]??1);
+    if(pr!==0)return pr;
+    const ad=a.due_date||'9999', bd=b.due_date||'9999';
+    return ad.localeCompare(bd);
+  });
+  const done=filtered.filter(t=>t.status==='done').sort((a,b)=>(b.completed_at||'').localeCompare(a.completed_at||''));
+
+  function taskRow(t){
+    const pipeline=pipelines.find(p=>p.id===t.pipeline_id);
+    const color=pipeline?pipeline.color:'#999';
+    const overdue=t.due_date&&t.due_date<todayStr&&t.status!=='done';
+    return`<div class="task-item">
+      <button class="task-check ${t.status==='done'?'done':''}" onclick="toggleTaskDone('${t.id}')">${t.status==='done'?'✓':''}</button>
+      <div class="task-body">
+        <div class="task-title ${t.status==='done'?'done':''}">${esc(t.title)}</div>
+        <div class="task-meta">
+          <span class="task-pipeline-tag" style="background:${color}">${esc(t.pipeline_name||'')}</span>
+          <span class="task-priority-dot" style="background:${PRIORITY_COLOR[t.priority]||'var(--text3)'}"></span>
+          ${t.due_date?`<span class="task-due ${overdue?'overdue':''}">${overdue?'⚠️ ':''}${fmtDate(t.due_date)} 까지</span>`:''}
+        </div>
+      </div>
+      <button class="task-del" onclick="deleteTask('${t.id}')">×</button>
+    </div>`;
+  }
+
+  const todoHtml=todo.length?todo.map(taskRow).join(''):`<div class="empty-state" style="padding:30px 20px;"><div class="empty-icon">✅</div><div class="empty-text">할 일이 없어요.</div></div>`;
+  const doneHtml=done.length?`<details style="margin-top:10px;">
+    <summary style="font-size:12px;color:var(--text3);cursor:pointer;list-style:none;padding:6px 10px;background:var(--bg);border-radius:20px;width:fit-content;">✅ 완료된 업무 (${done.length})</summary>
+    <div style="margin-top:8px;">${done.map(taskRow).join('')}</div>
+  </details>`:'';
+
+  c.innerHTML=filterChips+addCard+todoHtml+doneHtml;
+}
+
 const today=new Date();
 async function initApp(){
   loadLocal();
@@ -981,6 +1469,11 @@ async function initApp(){
   renderEntries();
   const ok = await loadFromSupabase();
   if(ok){renderCalendar();renderEntries();}
+  await loadCategories();
+  await loadActiveSession();
+  await loadPipelines();
+  await loadTasks();
+  renderTimerTab();
 }
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
 function fmtDate(ds){const d=new Date(ds+'T00:00:00');return`${d.getMonth()+1}월 ${d.getDate()}일`;}
@@ -993,10 +1486,12 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 function showTab(tab,el){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));
   el.classList.add('on');
-  ['diary','stats','settings'].forEach(t=>{
+  ['diary','timer','tasks','stats','settings'].forEach(t=>{
     document.getElementById('main-'+t).style.display=t===tab?'':'none';
   });
   document.getElementById('fab-btn').style.display=tab==='diary'?'':'none';
+  if(tab==='timer') renderTimerTab();
+  if(tab==='tasks') renderTasksTab();
   if(tab==='stats') renderStats();
   if(tab==='settings') renderSettings();
 }
@@ -1720,6 +2215,24 @@ function renderSettings(){
       <div class="setting-title">📚 책 목록</div>
       ${bookListHtml}
       <button class="btn-outline" style="margin-top:12px;" onclick="openAddBookModal()">+ 새 책 등록</button>
+    </div>
+    <div class="setting-card">
+      <div class="setting-title">⏱ 타임 카테고리 관리</div>
+      <div class="setting-note">스톱워치에서 쓸 카테고리를 추가하거나 삭제할 수 있어요.</div>
+      ${categories.map(c=>`<div class="cat-manage-row"><span style="color:${c.color};font-weight:500;">${esc(c.name)}</span><button onclick="deleteCategory('${c.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></div>`).join('')}
+      <div style="display:flex;gap:6px;margin-top:10px;">
+        <input type="text" id="inp-new-category" placeholder="새 카테고리 이름" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+        <button onclick="addCategory(document.getElementById('inp-new-category').value);document.getElementById('inp-new-category').value=''" style="padding:8px 14px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
+      </div>
+    </div>
+    <div class="setting-card">
+      <div class="setting-title">📋 파이프라인 관리</div>
+      <div class="setting-note">업무 탭에서 쓸 파이프라인(사업)을 추가하거나 삭제할 수 있어요.</div>
+      ${pipelines.map(p=>`<div class="cat-manage-row"><span style="color:${p.color};font-weight:500;">${esc(p.name)}</span><button onclick="deletePipeline('${p.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></div>`).join('')}
+      <div style="display:flex;gap:6px;margin-top:10px;">
+        <input type="text" id="inp-new-pipeline" placeholder="새 파이프라인 이름" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+        <button onclick="addPipeline(document.getElementById('inp-new-pipeline').value);document.getElementById('inp-new-pipeline').value=''" style="padding:8px 14px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
+      </div>
     </div>
     <div class="setting-card">
       <div class="setting-title">데이터 백업</div>
