@@ -677,7 +677,7 @@ let routineItems=[];
 
 async function loadRoutineItems(){
   try{
-    const res=await fetch(`${SUPABASE_URL}/rest/v1/routine_items?order=created_at.asc`,{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/routine_items?order=sort_order.asc,created_at.asc`,{
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
     });
     if(res.ok){
@@ -694,7 +694,7 @@ async function loadRoutineItems(){
     await fetch(`${SUPABASE_URL}/rest/v1/routine_items`,{
       method:'POST',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
-      body:JSON.stringify(routineItems.map(r=>({id:r.id,group_id:r.group_id,label:r.label,created_at:now})))
+      body:JSON.stringify(routineItems.map((r,i)=>({id:r.id,group_id:r.group_id,label:r.label,sort_order:i,created_at:now})))
     });
   }catch(e){}
 }
@@ -705,12 +705,13 @@ async function addRoutineItem(groupId,label){
   label=(label||'').trim();
   if(!label)return;
   const id=genId();
+  const sortOrder=routineItemsByGroup(groupId).length;
   routineItems.push({id,group_id:groupId,label});
   try{
     await fetch(`${SUPABASE_URL}/rest/v1/routine_items`,{
       method:'POST',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
-      body:JSON.stringify({id,group_id:groupId,label,created_at:new Date().toISOString()})
+      body:JSON.stringify({id,group_id:groupId,label,sort_order:sortOrder,created_at:new Date().toISOString()})
     });
     showToast('✅ 루틴 추가됨');
   }catch(e){showToast('⚠️ 동기화 실패',true);}
@@ -738,14 +739,37 @@ async function editRoutineItem(id){
   if(!trimmed)return;
   item.label=trimmed;
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/routine_items?id=eq.${id}`,{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/routine_items?id=eq.${id}`,{
       method:'PATCH',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
       body:JSON.stringify({label:trimmed})
     });
-    showToast('✅ 수정됨');
+    if(res.ok)showToast('✅ 수정됨');
+    else showToast('⚠️ 저장 실패 ('+res.status+')',true);
   }catch(e){showToast('⚠️ 동기화 실패',true);}
   renderSettings();
+}
+
+async function moveRoutineItem(id,dir){
+  const item=routineItems.find(r=>r.id===id);
+  if(!item)return;
+  const groupList=routineItemsByGroup(item.group_id);
+  const idxInGroup=groupList.findIndex(r=>r.id===id);
+  const swapIdxInGroup=idxInGroup+dir;
+  if(idxInGroup<0||swapIdxInGroup<0||swapIdxInGroup>=groupList.length)return;
+  const other=groupList[swapIdxInGroup];
+  const idxA=routineItems.findIndex(r=>r.id===item.id);
+  const idxB=routineItems.findIndex(r=>r.id===other.id);
+  [routineItems[idxA],routineItems[idxB]]=[routineItems[idxB],routineItems[idxA]];
+  renderSettings();
+  try{
+    const updatedGroupList=routineItemsByGroup(item.group_id);
+    await fetch(`${SUPABASE_URL}/rest/v1/routine_items`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify(updatedGroupList.map((r,i)=>({id:r.id,group_id:r.group_id,label:r.label,sort_order:i})))
+    });
+  }catch(e){}
 }
 
 let entries=[];
@@ -1080,7 +1104,7 @@ let timerTickInterval=null;
 
 async function loadCategories(){
   try{
-    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_categories?order=created_at.asc`,{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_categories?order=sort_order.asc,created_at.asc`,{
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
     });
     if(res.ok){
@@ -1097,7 +1121,7 @@ async function loadCategories(){
     await fetch(`${SUPABASE_URL}/rest/v1/time_categories`,{
       method:'POST',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
-      body:JSON.stringify(categories.map(c=>({id:c.id,name:c.name,color:c.color,created_at:new Date().toISOString()})))
+      body:JSON.stringify(categories.map((c,i)=>({id:c.id,name:c.name,color:c.color,sort_order:i,created_at:new Date().toISOString()})))
     });
   }catch(e){}
 }
@@ -1113,7 +1137,7 @@ async function addCategory(name){
     await fetch(`${SUPABASE_URL}/rest/v1/time_categories`,{
       method:'POST',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
-      body:JSON.stringify({id,name,color,created_at:new Date().toISOString()})
+      body:JSON.stringify({id,name,color,sort_order:categories.length-1,created_at:new Date().toISOString()})
     });
     showToast('✅ 카테고리 추가됨');
   }catch(e){showToast('⚠️ 동기화 실패',true);}
@@ -1141,14 +1165,30 @@ async function editCategory(id){
   if(!trimmed)return;
   cat.name=trimmed;
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/time_categories?id=eq.${id}`,{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_categories?id=eq.${id}`,{
       method:'PATCH',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
       body:JSON.stringify({name:trimmed})
     });
-    showToast('✅ 수정됨');
+    if(res.ok)showToast('✅ 수정됨');
+    else showToast('⚠️ 저장 실패 ('+res.status+')',true);
   }catch(e){showToast('⚠️ 동기화 실패',true);}
   renderSettings();
+}
+
+async function moveCategory(id,dir){
+  const idx=categories.findIndex(c=>c.id===id);
+  const swapIdx=idx+dir;
+  if(idx<0||swapIdx<0||swapIdx>=categories.length)return;
+  [categories[idx],categories[swapIdx]]=[categories[swapIdx],categories[idx]];
+  renderSettings();
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/time_categories`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify(categories.map((c,i)=>({id:c.id,name:c.name,color:c.color,sort_order:i})))
+    });
+  }catch(e){}
 }
 
 async function loadActiveSession(){
@@ -1352,7 +1392,7 @@ let taskAddPipelineId='';
 
 async function loadPipelines(){
   try{
-    const res=await fetch(`${SUPABASE_URL}/rest/v1/pipelines?order=created_at.asc`,{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/pipelines?order=sort_order.asc,created_at.asc`,{
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
     });
     if(res.ok){
@@ -1370,7 +1410,7 @@ async function loadPipelines(){
     await fetch(`${SUPABASE_URL}/rest/v1/pipelines`,{
       method:'POST',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
-      body:JSON.stringify(pipelines.map(p=>({id:p.id,name:p.name,color:p.color,created_at:new Date().toISOString()})))
+      body:JSON.stringify(pipelines.map((p,i)=>({id:p.id,name:p.name,color:p.color,sort_order:i,created_at:new Date().toISOString()})))
     });
   }catch(e){}
   if(pipelines.length) taskAddPipelineId=pipelines[0].id;
@@ -1387,7 +1427,7 @@ async function addPipeline(name){
     await fetch(`${SUPABASE_URL}/rest/v1/pipelines`,{
       method:'POST',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
-      body:JSON.stringify({id,name,color,created_at:new Date().toISOString()})
+      body:JSON.stringify({id,name,color,sort_order:pipelines.length-1,created_at:new Date().toISOString()})
     });
     showToast('✅ 파이프라인 추가됨');
   }catch(e){showToast('⚠️ 동기화 실패',true);}
@@ -1415,14 +1455,30 @@ async function editPipeline(id){
   if(!trimmed)return;
   p.name=trimmed;
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/pipelines?id=eq.${id}`,{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/pipelines?id=eq.${id}`,{
       method:'PATCH',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
       body:JSON.stringify({name:trimmed})
     });
-    showToast('✅ 수정됨');
+    if(res.ok)showToast('✅ 수정됨');
+    else showToast('⚠️ 저장 실패 ('+res.status+')',true);
   }catch(e){showToast('⚠️ 동기화 실패',true);}
   renderSettings();
+}
+
+async function movePipeline(id,dir){
+  const idx=pipelines.findIndex(p=>p.id===id);
+  const swapIdx=idx+dir;
+  if(idx<0||swapIdx<0||swapIdx>=pipelines.length)return;
+  [pipelines[idx],pipelines[swapIdx]]=[pipelines[swapIdx],pipelines[idx]];
+  renderSettings();
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/pipelines`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify(pipelines.map((p,i)=>({id:p.id,name:p.name,color:p.color,sort_order:i})))
+    });
+  }catch(e){}
 }
 
 async function loadTasks(){
@@ -2210,7 +2266,7 @@ function renderSettings(){
       ${ROUTINE_GROUP_DEFS.map(g=>`
         <div style="margin-bottom:14px;">
           <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:6px;">${g.label}</div>
-          ${routineItemsByGroup(g.id).map(it=>`<div class="cat-manage-row"><span>${esc(it.label)}</span><span style="display:flex;gap:4px;"><button onclick="editRoutineItem('${it.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;">수정</button><button onclick="deleteRoutineItem('${it.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></span></div>`).join('')}
+          ${routineItemsByGroup(g.id).map((it,i,arr)=>`<div class="cat-manage-row"><span>${esc(it.label)}</span><span style="display:flex;gap:4px;"><button onclick="moveRoutineItem('${it.id}',-1)" ${i===0?'disabled style="opacity:.3;font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:default;"':'style="font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;"'}>▲</button><button onclick="moveRoutineItem('${it.id}',1)" ${i===arr.length-1?'disabled style="opacity:.3;font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:default;"':'style="font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;"'}>▼</button><button onclick="editRoutineItem('${it.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;">수정</button><button onclick="deleteRoutineItem('${it.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></span></div>`).join('')}
           <div style="display:flex;gap:6px;margin-top:8px;">
             <input type="text" id="inp-new-routine-${g.id}" placeholder="예) 🧘 명상" style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
             <button onclick="addRoutineItem('${g.id}',document.getElementById('inp-new-routine-${g.id}').value);document.getElementById('inp-new-routine-${g.id}').value=''" style="padding:7px 12px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
@@ -2221,7 +2277,7 @@ function renderSettings(){
     <div class="setting-card">
       <div class="setting-title">⏱ 타임 카테고리 관리</div>
       <div class="setting-note">스톱워치에서 쓸 카테고리를 추가하거나 삭제할 수 있어요.</div>
-      ${categories.map(c=>`<div class="cat-manage-row"><span style="color:${c.color};font-weight:500;">${esc(c.name)}</span><span style="display:flex;gap:4px;"><button onclick="editCategory('${c.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;">수정</button><button onclick="deleteCategory('${c.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></span></div>`).join('')}
+      ${categories.map((c,i,arr)=>`<div class="cat-manage-row"><span style="color:${c.color};font-weight:500;">${esc(c.name)}</span><span style="display:flex;gap:4px;"><button onclick="moveCategory('${c.id}',-1)" ${i===0?'disabled style="opacity:.3;font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:default;"':'style="font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;"'}>▲</button><button onclick="moveCategory('${c.id}',1)" ${i===arr.length-1?'disabled style="opacity:.3;font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:default;"':'style="font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;"'}>▼</button><button onclick="editCategory('${c.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;">수정</button><button onclick="deleteCategory('${c.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></span></div>`).join('')}
       <div style="display:flex;gap:6px;margin-top:10px;">
         <input type="text" id="inp-new-category" placeholder="새 카테고리 이름" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
         <button onclick="addCategory(document.getElementById('inp-new-category').value);document.getElementById('inp-new-category').value=''" style="padding:8px 14px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
@@ -2230,7 +2286,7 @@ function renderSettings(){
     <div class="setting-card">
       <div class="setting-title">📋 파이프라인 관리</div>
       <div class="setting-note">업무 탭에서 쓸 파이프라인(사업)을 추가하거나 삭제할 수 있어요.</div>
-      ${pipelines.map(p=>`<div class="cat-manage-row"><span style="color:${p.color};font-weight:500;">${esc(p.name)}</span><span style="display:flex;gap:4px;"><button onclick="editPipeline('${p.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;">수정</button><button onclick="deletePipeline('${p.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></span></div>`).join('')}
+      ${pipelines.map((p,i,arr)=>`<div class="cat-manage-row"><span style="color:${p.color};font-weight:500;">${esc(p.name)}</span><span style="display:flex;gap:4px;"><button onclick="movePipeline('${p.id}',-1)" ${i===0?'disabled style="opacity:.3;font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:default;"':'style="font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;"'}>▲</button><button onclick="movePipeline('${p.id}',1)" ${i===arr.length-1?'disabled style="opacity:.3;font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:default;"':'style="font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;"'}>▼</button><button onclick="editPipeline('${p.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;">수정</button><button onclick="deletePipeline('${p.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></span></div>`).join('')}
       <div style="display:flex;gap:6px;margin-top:10px;">
         <input type="text" id="inp-new-pipeline" placeholder="새 파이프라인 이름" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
         <button onclick="addPipeline(document.getElementById('inp-new-pipeline').value);document.getElementById('inp-new-pipeline').value=''" style="padding:8px 14px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
