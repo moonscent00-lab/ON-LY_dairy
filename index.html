@@ -95,8 +95,8 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
 .routine-editor{margin-bottom:14px;}
 .routine-group{margin-bottom:12px;}
 .routine-group-title{font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;}
-.routine-toggle-row{display:flex;flex-wrap:wrap;gap:6px;}
-.rt-btn{padding:4px 8px;border-radius:20px;font-size:11px;border:1px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+.routine-toggle-row{display:flex;flex-wrap:wrap;gap:4px;}
+.rt-btn{padding:3px 5px;border-radius:16px;font-size:10px;border:1px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;white-space:nowrap;}
 .rt-btn.done{background:var(--accent);color:#fff;border-color:var(--accent);}
 .rt-btn.skip{background:var(--bg);color:var(--text3);border-style:dashed;}
 
@@ -300,6 +300,7 @@ input[type=number]{-moz-appearance:textfield;}
     <input type="number" id="inp-fat" placeholder="체지방 %" step="0.1" style="flex:1;min-width:0;padding:8px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
   </div>
 
+  <div class="sec-label">일기</div>
   <div class="field"><textarea id="inp-text" placeholder="오늘 있었던 일, 생각, 느낌..."></textarea></div>
 
   <div class="sec-label">장소 & 링크 메모</div>
@@ -648,7 +649,7 @@ async function loadFromSupabase() {
 const ROUTINE_GROUP_DEFS=[
   {id:'morning', label:'☀️ 아침루틴'},
   {id:'daytime', label:'🏙️ 일과루틴'},
-  {id:'core8', label:'8코어'},
+  {id:'core8', label:'🧭 8코어'},
   {id:'evening', label:'🌙 저녁루틴'},
 ];
 const DEFAULT_ROUTINE_ITEMS=[
