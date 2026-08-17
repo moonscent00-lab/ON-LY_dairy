@@ -1097,7 +1097,7 @@ const DEFAULT_CATEGORIES=[
   {name:'업무',color:'#E9C46A'},
   {name:'휴식',color:'#A8A39A'}
 ];
-const CAT_PALETTE=['#7B5EA7','#457B9D','#2D6A4F','#E76F51','#E9C46A','#A8A39A','#E63946','#F4A261','#264653','#8AB17D'];
+const CAT_PALETTE=['#7B5EA7','#9B7FD1','#457B9D','#6BA3C5','#2D6A4F','#52A97C','#E76F51','#F4A261','#E9C46A','#D4A017','#E63946','#F4849C','#264653','#5C7A89','#8AB17D','#A8A39A'];
 let categories=[];
 let activeSession=null;
 let timerTickInterval=null;
@@ -1174,6 +1174,22 @@ async function editCategory(id){
     else showToast('⚠️ 저장 실패 ('+res.status+')',true);
   }catch(e){showToast('⚠️ 동기화 실패',true);}
   renderSettings();
+}
+
+async function setCategoryColor(id,color){
+  const cat=categories.find(c=>c.id===id);
+  if(!cat)return;
+  cat.color=color;
+  renderSettings();
+  if(document.getElementById('timer-content'))renderTimerTab();
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_categories?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({color})
+    });
+    if(!res.ok)showToast('⚠️ 저장 실패 ('+res.status+')',true);
+  }catch(e){showToast('⚠️ 동기화 실패',true);}
 }
 
 async function moveCategory(id,dir){
@@ -2291,7 +2307,20 @@ function renderSettings(){
     <div class="setting-card">
       <div class="setting-title">⏱ 타임 카테고리 관리</div>
       <div class="setting-note">스톱워치에서 쓸 카테고리를 추가하거나 삭제할 수 있어요.</div>
-      ${categories.map((c,i,arr)=>`<div class="cat-manage-row"><span style="color:${c.color};font-weight:500;">${esc(c.name)}</span><span style="display:flex;gap:4px;"><button onclick="moveCategory('${c.id}',-1)" ${i===0?'disabled style="opacity:.3;font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:default;"':'style="font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;"'}>▲</button><button onclick="moveCategory('${c.id}',1)" ${i===arr.length-1?'disabled style="opacity:.3;font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:default;"':'style="font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;"'}>▼</button><button onclick="editCategory('${c.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;">수정</button><button onclick="deleteCategory('${c.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></span></div>`).join('')}
+      ${categories.map((c,i,arr)=>`<div class="cat-manage-row" style="flex-direction:column;align-items:stretch;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:${c.color};font-weight:500;">${esc(c.name)}</span>
+          <span style="display:flex;gap:4px;">
+            <button onclick="moveCategory('${c.id}',-1)" ${i===0?'disabled style="opacity:.3;font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:default;"':'style="font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;"'}>▲</button>
+            <button onclick="moveCategory('${c.id}',1)" ${i===arr.length-1?'disabled style="opacity:.3;font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:default;"':'style="font-size:11px;padding:3px 6px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;"'}>▼</button>
+            <button onclick="editCategory('${c.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;">수정</button>
+            <button onclick="deleteCategory('${c.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button>
+          </span>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          ${CAT_PALETTE.map(col=>`<span onclick="setCategoryColor('${c.id}','${col}')" style="width:18px;height:18px;border-radius:50%;background:${col};cursor:pointer;display:inline-block;border:2px solid ${c.color.toLowerCase()===col.toLowerCase()?'var(--text)':'transparent'};"></span>`).join('')}
+        </div>
+      </div>`).join('')}
       <div style="display:flex;gap:6px;margin-top:10px;">
         <input type="text" id="inp-new-category" placeholder="새 카테고리 이름" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
         <button onclick="addCategory(document.getElementById('inp-new-category').value);document.getElementById('inp-new-category').value=''" style="padding:8px 14px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
