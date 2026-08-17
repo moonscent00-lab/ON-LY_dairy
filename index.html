@@ -1185,13 +1185,19 @@ async function startSession(catId){
   activeSession={id,categoryId:cat.id,categoryName:cat.name,startTime};
   renderTimerTab();
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/time_sessions`,{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_sessions`,{
       method:'POST',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
       body:JSON.stringify({id,category_id:cat.id,category_name:cat.name,start_time:startTime,end_time:null,duration_min:null,date:startTime.slice(0,10)})
     });
-    showToast('▶️ '+cat.name+' 시작');
-  }catch(e){showToast('⚠️ 저장 실패',true);}
+    if(res.ok){
+      showToast('▶️ '+cat.name+' 시작');
+    } else {
+      const errText=await res.text().catch(()=>'');
+      showToast('⚠️ 저장 실패 — 새로고침하면 사라져요 ('+res.status+')',true);
+      console.error('time_sessions insert failed', res.status, errText);
+    }
+  }catch(e){showToast('⚠️ 저장 실패 — 새로고침하면 사라져요',true);}
 }
 
 async function endSession(){
@@ -1201,14 +1207,27 @@ async function endSession(){
   const sessionId=activeSession.id;
   const catName=activeSession.categoryName;
   activeSession=null;
-  renderTimerTab();
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/time_sessions?id=eq.${sessionId}`,{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_sessions?id=eq.${sessionId}`,{
       method:'PATCH',
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
       body:JSON.stringify({end_time:endTime,duration_min:durMin})
     });
-    showToast('⏹ '+catName+' 종료 · '+durMin+'분');
+    if(res.ok){
+      showToast('⏹ '+catName+' 종료 · '+durMin+'분');
+      const memo=prompt('무슨 '+catName+'을(를) 하셨나요? (건너뛰려면 취소)','');
+      if(memo&&memo.trim()){
+        try{
+          await fetch(`${SUPABASE_URL}/rest/v1/time_sessions?id=eq.${sessionId}`,{
+            method:'PATCH',
+            headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+            body:JSON.stringify({memo:memo.trim()})
+          });
+        }catch(e){}
+      }
+    } else {
+      showToast('⚠️ 저장 실패 ('+res.status+')',true);
+    }
   }catch(e){showToast('⚠️ 저장 실패',true);}
   renderTimerTab();
 }
@@ -1282,17 +1301,35 @@ async function renderTimerTab(){
       const st=new Date(s.start_time), et=new Date(s.end_time);
       const stStr=`${String(st.getHours()).padStart(2,'0')}:${String(st.getMinutes()).padStart(2,'0')}`;
       const etStr=`${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
-      return`<div class="timeline-block">
+      return`<div class="timeline-block" onclick="editSessionMemo('${s.id}')" style="cursor:pointer;">
         <span class="timeline-dot" style="background:${color}"></span>
         <div class="timeline-info">
           <div class="timeline-cat" style="color:${color}">${esc(s.category_name||'')}</div>
           <div class="timeline-time">${stStr} ~ ${etStr}</div>
+          ${s.memo?`<div style="font-size:11px;color:var(--text2);margin-top:3px;">📝 ${esc(s.memo)}</div>`:'<div style="font-size:11px;color:var(--text3);margin-top:3px;">+ 메모 추가</div>'}
         </div>
         <div class="timeline-dur">${s.duration_min}분</div>
       </div>`;
     }).join('');
     return`<div class="timeline-day"><div class="timeline-date">${fmtDate(d)} (${getWd(d)})</div>${rows}</div>`;
   }).join('');
+}
+
+async function editSessionMemo(sessionId){
+  const res=await loadSessions();
+  const s=res.find(x=>x.id===sessionId);
+  const current=s?s.memo||'':'';
+  const memo=prompt('메모', current);
+  if(memo===null)return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/time_sessions?id=eq.${sessionId}`,{
+      method:'PATCH',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({memo:memo.trim()})
+    });
+    showToast('✅ 메모 저장됨');
+  }catch(e){showToast('⚠️ 저장 실패',true);}
+  renderTimerTab();
 }
 
 /* ── 업무 (파이프라인별 할일) ── */
