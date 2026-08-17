@@ -24,8 +24,9 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;min-height
 .nav-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .nav-title{font-family:'Noto Serif KR',serif;font-size:18px;font-weight:600;letter-spacing:.05em;}
 .nav-today{font-size:12px;color:var(--text3);}
-.nav-tabs{display:flex;gap:4px;}
-.nav-tab{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500;border:none;background:none;color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.nav-tabs{display:flex;gap:4px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px;}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.nav-tab{padding:6px 10px;border-radius:20px;font-size:12px;font-weight:500;border:none;background:none;color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;flex-shrink:0;}
 .nav-tab.on{background:var(--text);color:#fff;}
 
 .main{flex:1;padding:16px;padding-bottom:90px;}
@@ -164,8 +165,8 @@ input[type=number]{-moz-appearance:textfield;}
 .timer-elapsed{font-family:'Noto Serif KR',serif;font-size:38px;font-weight:600;margin:10px 0 18px;}
 .timer-cat-badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:13px;color:#fff;margin-bottom:6px;}
 .timer-btn-stop{width:100%;padding:16px;border-radius:var(--r-sm);border:none;font-size:16px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:var(--danger);color:#fff;}
-.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.cat-btn{padding:16px 6px;border-radius:var(--r-sm);border:1.5px solid var(--border2);background:var(--bg);font-size:13px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.cat-btn{padding:10px 4px;border-radius:var(--r-sm);border:1.5px solid var(--border2);background:var(--bg);font-size:11px;font-weight:500;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
 .timeline-day{margin-bottom:14px;}
 .timeline-date{font-size:12px;color:var(--text2);font-weight:500;margin-bottom:8px;}
 .timeline-block{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--border);margin-bottom:6px;}
@@ -212,10 +213,11 @@ input[type=number]{-moz-appearance:textfield;}
   </div>
   <div class="nav-tabs">
     <button class="nav-tab on" onclick="showTab('timer',this)">⏱ 타임</button>
-    <button class="nav-tab" onclick="showTab('diary',this)">다이어리</button>
-    <button class="nav-tab" onclick="showTab('tasks',this)">📋 업무</button>
-    <button class="nav-tab" onclick="showTab('stats',this)">통계</button>
-    <button class="nav-tab" onclick="showTab('settings',this)">설정</button>
+    <button class="nav-tab" onclick="showTab('diary',this)">📔 다이어리</button>
+    <button class="nav-tab" onclick="showTab('tasks',this)">🎯 원씽</button>
+    <button class="nav-tab" onclick="showTab('reading',this)">📖 독서</button>
+    <button class="nav-tab" onclick="showTab('stats',this)">📊 통계</button>
+    <button class="nav-tab" onclick="showTab('settings',this)">⚙️ 설정</button>
   </div>
 </div>
 
@@ -251,6 +253,7 @@ input[type=number]{-moz-appearance:textfield;}
 </div>
 <div class="main" id="main-timer"><div id="timer-content"></div></div>
 <div class="main" id="main-tasks" style="display:none"><div id="tasks-content"></div></div>
+<div class="main" id="main-reading" style="display:none"><div id="reading-content"></div></div>
 <div class="main" id="main-stats" style="display:none">
   <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
     <button onclick="captureStats()" style="padding:7px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📸 이미지로 저장</button>
@@ -270,24 +273,19 @@ input[type=number]{-moz-appearance:textfield;}
     <button onclick="closeWriteModal()" style="border:none;background:none;font-size:22px;color:var(--text3);cursor:pointer;padding:0 4px;line-height:1;">×</button>
   </div>
 
-  <!-- 날짜 + 컨디션 한 줄 -->
-  <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
-    <input type="date" id="inp-date" style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-    <div style="display:flex;gap:4px;">
-      <button class="mood-btn" onclick="setMood('😴',this)" style="padding:5px 7px;font-size:16px;">😴</button>
-      <button class="mood-btn" onclick="setMood('😡',this)" style="padding:5px 7px;font-size:16px;">😡</button>
-      <button class="mood-btn" onclick="setMood('😢',this)" style="padding:5px 7px;font-size:16px;">😢</button>
-      <button class="mood-btn" onclick="setMood('🙂',this)" style="padding:5px 7px;font-size:16px;">🙂</button>
-      <button class="mood-btn" onclick="setMood('😊',this)" style="padding:5px 7px;font-size:16px;">😊</button>
-    </div>
+  <!-- 날짜 -->
+  <div class="field">
+    <input type="date" id="inp-date" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
   </div>
 
-  <!-- 오늘의 원씽 한 줄 -->
-  <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;">
-    <span style="font-size:13px;color:var(--accent);font-weight:500;white-space:nowrap;">🎯</span>
-    <input type="text" id="inp-one-thing" placeholder="오늘의 원씽" style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-    <button type="button" id="btn-one-thing-done" onclick="setOneThingDone(true,this)" style="padding:5px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:none;font-size:16px;cursor:pointer;">✅</button>
-    <button type="button" id="btn-one-thing-fail" onclick="setOneThingDone(false,this)" style="padding:5px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:none;font-size:16px;cursor:pointer;">❌</button>
+  <!-- 기분 -->
+  <div style="display:flex;gap:4px;margin-bottom:14px;">
+    <button class="mood-btn" onclick="setMood('❤️',this)" style="padding:8px 4px;font-size:18px;">❤️</button>
+    <button class="mood-btn" onclick="setMood('☀️',this)" style="padding:8px 4px;font-size:18px;">☀️</button>
+    <button class="mood-btn" onclick="setMood('🌈',this)" style="padding:8px 4px;font-size:18px;">🌈</button>
+    <button class="mood-btn" onclick="setMood('✨',this)" style="padding:8px 4px;font-size:18px;">✨</button>
+    <button class="mood-btn" onclick="setMood('☔️',this)" style="padding:8px 4px;font-size:18px;">☔️</button>
+    <button class="mood-btn" onclick="setMood('⚡️',this)" style="padding:8px 4px;font-size:18px;">⚡️</button>
   </div>
 
   <!-- 루틴 체크 -->
@@ -301,80 +299,6 @@ input[type=number]{-moz-appearance:textfield;}
     <input type="number" id="inp-muscle" placeholder="골격근 kg" step="0.01" style="flex:1;min-width:0;padding:8px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
     <input type="number" id="inp-fat" placeholder="체지방 %" step="0.1" style="flex:1;min-width:0;padding:8px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
   </div>
-
-  <!-- 운동 -->
-  <div class="sec-label">운동</div>
-  <div style="margin-bottom:8px;">
-    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;" id="cardio-type-row">
-      <button class="rt-btn" onclick="setCardioType('수영',this)">🏊 수영</button>
-      <button class="rt-btn" onclick="setCardioType('홈트',this)">🏠 홈트</button>
-      <button class="rt-btn" onclick="setCardioType('산책/트레킹',this)">🥾 산책</button>
-      <button class="rt-btn" onclick="setCardioType('러닝',this)">🏃 러닝</button>
-      <button class="rt-btn" onclick="setCardioType('기타',this)">➕ 기타</button>
-    </div>
-    <input type="text" id="inp-cardio-type-custom" placeholder="직접 입력" style="display:none;width:100%;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);margin-bottom:8px;">
-    <div style="display:flex;gap:4px;margin-bottom:4px;">
-      <input type="text" inputmode="numeric" id="inp-cardio-min" placeholder="분" oninput="autoBurnKcal()" style="flex:1;min-width:0;padding:7px 2px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-      <input type="text" inputmode="numeric" id="inp-cardio-hr" placeholder="심박" style="flex:1;min-width:0;padding:7px 2px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-      <input type="text" inputmode="numeric" id="inp-cardio-kcal" placeholder="kcal" oninput="autoBurnKcal()" style="flex:1;min-width:0;padding:7px 2px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-    </div>
-    <div style="display:flex;gap:4px;margin-bottom:6px;">
-      <input type="text" inputmode="numeric" id="inp-steps" placeholder="걸음수" oninput="autoBurnKcal()" style="flex:1;min-width:0;padding:7px 2px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--bg);">
-      <input type="text" inputmode="numeric" id="inp-burn-kcal" placeholder="🔥 소모" style="flex:1;min-width:0;padding:7px 2px;border:1px solid var(--accent-light);border-radius:var(--r-sm);font-size:12px;text-align:center;background:var(--accent-light);color:var(--accent);">
-    </div>
-    <!-- 유산소 2 - 기본 숨김 -->
-    <div id="cardio2-section" style="display:none;">
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;" id="cardio-type-row2">
-        <button class="rt-btn" onclick="setCardioType2('수영',this)">🏊</button>
-        <button class="rt-btn" onclick="setCardioType2('홈트',this)">🏠</button>
-        <button class="rt-btn" onclick="setCardioType2('산책/트레킹',this)">🥾</button>
-        <button class="rt-btn" onclick="setCardioType2('러닝',this)">🏃</button>
-        <button class="rt-btn" onclick="setCardioType2('기타',this)">➕</button>
-      </div>
-      <div style="display:flex;gap:4px;margin-bottom:8px;">
-        <input type="number" id="inp-cardio2-min" placeholder="분" step="1" style="flex:1;padding:7px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
-        <input type="number" id="inp-cardio2-hr" placeholder="심박" step="1" style="flex:1;padding:7px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
-        <input type="number" id="inp-cardio2-kcal" placeholder="kcal" step="1" oninput="autoBurnKcal()" style="flex:1;padding:7px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;text-align:center;background:var(--bg);">
-      </div>
-    </div>
-    <button type="button" onclick="document.getElementById('cardio2-section').style.display=document.getElementById('cardio2-section').style.display==='none'?'block':'none'" style="font-size:11px;color:var(--text3);border:none;background:none;cursor:pointer;padding:0;margin-bottom:8px;">➕ 유산소 추가</button>
-  </div>
-  <div class="field">
-    <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px;font-weight:500;">근력 <span style="font-weight:400;color:var(--text3);">— 플랜핏 결과 붙여넣기</span></label>
-    <textarea id="inp-strength" placeholder="붙여넣기하면 자동으로 정리됩니다" style="min-height:80px;font-size:13px;" onpaste="parsePlanfit(event)" oninput="autoBurnKcal()"></textarea>
-  </div>
-
-  <div class="sec-label">독서</div>
-  <div id="book-select-area" style="margin-bottom:14px;"></div>
-  <div id="book-memo-field" style="display:none;">
-    <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:7px;">독서 메모</div>
-    <div style="display:flex;gap:8px;margin-bottom:8px;">
-      <textarea id="inp-book-memo" placeholder="문장이나 느낌 입력..." style="flex:1;min-height:70px;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:Noto Sans KR,sans-serif;resize:none;background:var(--bg);"></textarea>
-      <button onclick="addBookMemoLine()" style="padding:8px 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:Noto Sans KR,sans-serif;flex-shrink:0;align-self:flex-end;">추가</button>
-    </div>
-    <div id="book-memo-lines" style="display:none;margin-bottom:10px;">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">오늘 추가한 메모</div>
-      <div id="book-memo-lines-content" style="padding:10px 12px;background:var(--bg);border-radius:var(--r-sm);border:1px solid var(--border);font-size:12px;color:var(--text);white-space:pre-wrap;line-height:1.9;max-height:140px;overflow-y:auto;"></div>
-    </div>
-    <div id="book-notes-preview" style="display:none;margin-bottom:14px;">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">지금까지 쌓인 메모</div>
-      <div id="book-notes-content" style="padding:10px 12px;background:var(--bg);border-radius:var(--r-sm);border:1px solid var(--border);font-size:12px;color:var(--text2);white-space:pre-wrap;line-height:1.8;max-height:160px;overflow-y:auto;"></div>
-    </div>
-  </div>
-
-  <div class="sec-label">🍽 식단</div>
-  <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;">
-    <input type="text" id="inp-breakfast" placeholder="🌅 아침" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-    <input type="text" id="inp-lunch" placeholder="🍽 점심" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-    <input type="text" id="inp-dinner" placeholder="🌙 저녁" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-    <input type="text" id="inp-snack" placeholder="🍬 간식" style="padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-  </div>
-  <!-- 숨겨진 칼로리/단백질 필드 (Supabase 호환용) -->
-  <input type="hidden" id="inp-breakfast-kcal"><input type="hidden" id="inp-breakfast-protein">
-  <input type="hidden" id="inp-lunch-kcal"><input type="hidden" id="inp-lunch-protein">
-  <input type="hidden" id="inp-dinner-kcal"><input type="hidden" id="inp-dinner-protein">
-  <input type="hidden" id="inp-snack-kcal"><input type="hidden" id="inp-snack-protein">
-  <input type="hidden" id="inp-intake-kcal"><input type="hidden" id="inp-intake-protein">
 
   <div class="field"><textarea id="inp-text" placeholder="오늘 있었던 일, 생각, 느낌..."></textarea></div>
 
@@ -721,38 +645,90 @@ async function loadFromSupabase() {
   showToast('✅ 최신 데이터로 갱신됐어요');
   return true;
 }
-const ROUTINE_GROUPS=[
-  {id:'life', label:'라이프/운동', items:[
-    {id:'book',label:'📚 독서'},
-    {id:'water',label:'💧 물 1L'},
-    {id:'sup_am',label:'💊 영양제 ☀️'},
-    {id:'sup_pm',label:'💊 영양제 🌙'},
-    {id:'record',label:'📝 기록&계획'},
-    {id:'cardio',label:'🏃 유산소'},
-    {id:'strength',label:'🏋️ 근력'},
-  ]},
-  {id:'content', label:'콘텐츠', items:[
-    {id:'blog',label:'✍️ 블로그'},
-    {id:'write',label:'📝 글쓰기'},
-    {id:'sns',label:'📱 SNS'},
-    {id:'stock',label:'🖼️ 어스톡'},
-  ]},
-  {id:'atomy', label:'애터미 8코어', items:[
-    {id:'atomy_book',label:'📖 책읽기'},
-    {id:'atomy_vod',label:'🎬 VOD시청'},
-    {id:'atomy_meeting',label:'🤝 미팅참여'},
-    {id:'atomy_product',label:'💙 제품애용'},
-    {id:'atomy_stp',label:'🎯 STP'},
-    {id:'atomy_deliver',label:'📦 제품전달'},
-    {id:'atomy_sponsor',label:'💬 스폰서상담'},
-    {id:'atomy_trust',label:'🌱 신뢰쌓기'},
-  ]},
-  {id:'insurance', label:'보험', items:[
-    {id:'ins_commute',label:'🏢 출근'},
-    {id:'ins_study',label:'📋 상품공부'},
-    {id:'ins_consult',label:'🤝 보험상담'},
-  ]},
+const ROUTINE_GROUP_DEFS=[
+  {id:'morning', label:'☀️ 아침루틴'},
+  {id:'daytime', label:'🏙️ 일과루틴'},
+  {id:'core8', label:'8코어'},
+  {id:'evening', label:'🌙 저녁루틴'},
 ];
+const DEFAULT_ROUTINE_ITEMS=[
+  {group_id:'morning',label:'📚 독서'},
+  {group_id:'morning',label:'🏃 운동'},
+  {group_id:'morning',label:'💊 영양제'},
+  {group_id:'daytime',label:'✍️ 콘텐츠'},
+  {group_id:'daytime',label:'🏢 출근'},
+  {group_id:'daytime',label:'📋 공부'},
+  {group_id:'daytime',label:'🤝 상담'},
+  {group_id:'core8',label:'📖 독서'},
+  {group_id:'core8',label:'🎬 영상'},
+  {group_id:'core8',label:'🤝 미팅'},
+  {group_id:'core8',label:'💙 애용'},
+  {group_id:'core8',label:'🎯 STP'},
+  {group_id:'core8',label:'📦 전달'},
+  {group_id:'core8',label:'💬 상담'},
+  {group_id:'core8',label:'🌱 신뢰'},
+  {group_id:'evening',label:'🧴 관리'},
+  {group_id:'evening',label:'💊 영양제'},
+  {group_id:'evening',label:'📝 기록'},
+];
+let routineItems=[];
+
+async function loadRoutineItems(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/routine_items?order=created_at.asc`,{
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    if(res.ok){
+      const data=await res.json();
+      if(data&&data.length>0){
+        routineItems=data.map(r=>({id:r.id,group_id:r.group_id,label:r.label}));
+        return;
+      }
+    }
+  }catch(e){}
+  routineItems=[];
+  for(const it of DEFAULT_ROUTINE_ITEMS){
+    const id=genId();
+    routineItems.push({id,group_id:it.group_id,label:it.label});
+    try{
+      await fetch(`${SUPABASE_URL}/rest/v1/routine_items`,{
+        method:'POST',
+        headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+        body:JSON.stringify({id,group_id:it.group_id,label:it.label,created_at:new Date().toISOString()})
+      });
+    }catch(e){}
+  }
+}
+
+function routineItemsByGroup(gid){ return routineItems.filter(r=>r.group_id===gid); }
+
+async function addRoutineItem(groupId,label){
+  label=(label||'').trim();
+  if(!label)return;
+  const id=genId();
+  routineItems.push({id,group_id:groupId,label});
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/routine_items`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({id,group_id:groupId,label,created_at:new Date().toISOString()})
+    });
+    showToast('✅ 루틴 추가됨');
+  }catch(e){showToast('⚠️ 동기화 실패',true);}
+  renderSettings();
+}
+
+async function deleteRoutineItem(id){
+  if(!confirm('이 루틴 항목을 삭제할까요?'))return;
+  routineItems=routineItems.filter(r=>r.id!==id);
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/routine_items?id=eq.${id}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+  }catch(e){}
+  renderSettings();
+}
 
 let entries=[];
 let editingId=null;
@@ -916,6 +892,7 @@ function saveNewBook(){
   saveBooks();
   document.getElementById('add-book-modal').style.display='none';
   buildBookSelectArea();
+  if(document.getElementById('reading-content'))renderReadingTab();
 }
 
 function finishBook(id){
@@ -925,6 +902,55 @@ function finishBook(id){
   if(b){b.status='done';b.endDate=dateInput;}
   selectedBookIds.delete(id);
   saveBooks();buildBookSelectArea();
+  if(document.getElementById('reading-content'))renderReadingTab();
+}
+
+function renderReadingTab(){
+  const c=document.getElementById('reading-content');
+  if(!c)return;
+  const reading=books.filter(b=>b.status==='reading');
+  const done=books.filter(b=>b.status==='done');
+  c.innerHTML=`
+    <div class="setting-card" style="margin-bottom:16px;">
+      <div class="setting-title">📖 읽는 중</div>
+      ${reading.length?reading.map(b=>`
+        <div style="padding:12px 0;border-bottom:1px solid var(--border);">
+          <div style="font-weight:500;font-size:14px;">${esc(b.title)}</div>
+          ${b.author?`<div style="font-size:11px;color:var(--text3);margin-bottom:8px;">${esc(b.author)}</div>`:'<div style="margin-bottom:8px;"></div>'}
+          <div style="display:flex;gap:6px;margin-bottom:8px;">
+            <input type="text" id="reading-memo-${b.id}" placeholder="오늘 읽은 느낌..." style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+            <button onclick="addBookMemoDirect('${b.id}')" style="padding:7px 12px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-sm);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button onclick="viewBookNotes('${b.id}')" style="font-size:11px;padding:4px 10px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">메모보기</button>
+            <button onclick="finishBook('${b.id}')" style="font-size:11px;padding:4px 10px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">완독</button>
+            <button onclick="deleteBook('${b.id}');renderReadingTab();" style="font-size:11px;padding:4px 10px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">삭제</button>
+          </div>
+        </div>`).join(''):'<div style="font-size:13px;color:var(--text3);padding:8px 0;">읽고 있는 책이 없어요.</div>'}
+      <button class="btn-outline" style="margin-top:12px;" onclick="openAddBookModal()">+ 새 책 등록</button>
+    </div>
+    ${done.length?`<div class="setting-card">
+      <div class="setting-title">✅ 완독</div>
+      ${done.map(b=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <div>${esc(b.title)}${b.author?`<span style="font-size:11px;color:var(--text3);margin-left:6px;">${esc(b.author)}</span>`:''}</div>
+        <button onclick="viewBookNotes('${b.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">메모보기</button>
+      </div>`).join('')}
+    </div>`:''}
+  `;
+}
+
+async function addBookMemoDirect(bookId){
+  const input=document.getElementById('reading-memo-'+bookId);
+  const val=(input?.value||'').trim();
+  if(!val)return;
+  const book=books.find(b=>b.id===bookId);
+  if(!book)return;
+  const d=new Date();
+  const prefix='['+(d.getMonth()+1)+'/'+d.getDate()+'] ';
+  book.notes=(book.notes?book.notes+' | ':'')+prefix+val;
+  await saveBooks();
+  showToast('✅ 메모 추가됨');
+  renderReadingTab();
 }
 
 const DB_BOOKS='only_books_v1';
@@ -1339,21 +1365,18 @@ function setTaskFilter(id){
 
 async function addTaskFromForm(){
   const input=document.getElementById('task-title-input');
-  const dueInput=document.getElementById('task-due-input');
   const title=(input?.value||'').trim();
   if(!title){showToast('할일 내용을 입력해주세요',true);return;}
   if(!taskAddPipelineId&&pipelines.length) taskAddPipelineId=pipelines[0].id;
   const pipeline=pipelines.find(p=>p.id===taskAddPipelineId);
   const id=genId();
-  const dueDate=dueInput?.value||'';
   const newTask={
     id, pipeline_id:taskAddPipelineId, pipeline_name:pipeline?pipeline.name:'',
-    title, due_date:dueDate, priority:taskAddPriority, status:'todo',
+    title, due_date:'', priority:taskAddPriority, status:'todo',
     created_at:new Date().toISOString(), completed_at:null
   };
   tasks.unshift(newTask);
   input.value='';
-  if(dueInput)dueInput.value='';
   renderTasksTab();
   try{
     await fetch(`${SUPABASE_URL}/rest/v1/tasks`,{
@@ -1417,9 +1440,6 @@ function renderTasksTab(){
       <button class="priority-btn ${taskAddPriority==='high'?'on-high':''}" onclick="setTaskAddPriority('high')">🔴 상</button>
       <button class="priority-btn ${taskAddPriority==='mid'?'on-mid':''}" onclick="setTaskAddPriority('mid')">🟠 중</button>
       <button class="priority-btn ${taskAddPriority==='low'?'on-low':''}" onclick="setTaskAddPriority('low')">⚪ 하</button>
-    </div>
-    <div class="task-add-row">
-      <input type="date" id="task-due-input" style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
       <button onclick="addTaskFromForm()" style="padding:8px 18px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
     </div>
   </div>`;
@@ -1436,7 +1456,6 @@ function renderTasksTab(){
   function taskRow(t){
     const pipeline=pipelines.find(p=>p.id===t.pipeline_id);
     const color=pipeline?pipeline.color:'#999';
-    const overdue=t.due_date&&t.due_date<todayStr&&t.status!=='done';
     return`<div class="task-item">
       <button class="task-check ${t.status==='done'?'done':''}" onclick="toggleTaskDone('${t.id}')">${t.status==='done'?'✓':''}</button>
       <div class="task-body">
@@ -1444,7 +1463,6 @@ function renderTasksTab(){
         <div class="task-meta">
           <span class="task-pipeline-tag" style="background:${color}">${esc(t.pipeline_name||'')}</span>
           <span class="task-priority-dot" style="background:${PRIORITY_COLOR[t.priority]||'var(--text3)'}"></span>
-          ${t.due_date?`<span class="task-due ${overdue?'overdue':''}">${overdue?'⚠️ ':''}${fmtDate(t.due_date)} 까지</span>`:''}
         </div>
       </div>
       <button class="task-del" onclick="deleteTask('${t.id}')">×</button>
@@ -1473,6 +1491,7 @@ async function initApp(){
   await loadActiveSession();
   await loadPipelines();
   await loadTasks();
+  await loadRoutineItems();
   renderTimerTab();
 }
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
@@ -1486,12 +1505,13 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 function showTab(tab,el){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));
   el.classList.add('on');
-  ['diary','timer','tasks','stats','settings'].forEach(t=>{
+  ['diary','timer','tasks','reading','stats','settings'].forEach(t=>{
     document.getElementById('main-'+t).style.display=t===tab?'':'none';
   });
   document.getElementById('fab-btn').style.display=tab==='diary'?'':'none';
   if(tab==='timer') renderTimerTab();
   if(tab==='tasks') renderTasksTab();
+  if(tab==='reading') renderReadingTab();
   if(tab==='stats') renderStats();
   if(tab==='settings') renderSettings();
 }
@@ -1499,18 +1519,21 @@ function showTab(tab,el){
 function buildRoutineEditor(state){
   state=state||{};
   const c=document.getElementById('routine-editor');
-  c.innerHTML=ROUTINE_GROUPS.map(g=>`
+  c.innerHTML=ROUTINE_GROUP_DEFS.map(g=>{
+    const items=routineItemsByGroup(g.id);
+    if(!items.length)return'';
+    return`
     <div class="routine-group">
       <div class="routine-group-title">${g.label}</div>
       <div class="routine-toggle-row">
-        ${g.items.map(item=>{
+        ${items.map(item=>{
           const v=state[item.id]||'none';
           return`<button class="rt-btn ${v==='done'?'done':v==='skip'?'skip':''}" 
             onclick="cycleRoutine('${item.id}',this)">${item.label}</button>`;
         }).join('')}
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
   routineState={...state};
 }
 
@@ -1526,46 +1549,12 @@ function openModal(id){
   document.getElementById('modal-title').textContent='새 일기';
   document.getElementById('inp-date').value=today.toISOString().slice(0,10);
   ['weight','muscle','fat'].forEach(k=>document.getElementById('inp-'+k).value='');
-  // inp-protein removed
-  document.getElementById('inp-cardio-min').value='';
-  document.getElementById('inp-cardio-hr').value='';
-  document.getElementById('inp-cardio-kcal').value='';
-  document.getElementById('inp-steps').value='';
-  selectedCardioType2='';
-  document.querySelectorAll('#cardio-type-row2 .rt-btn').forEach(b=>b.classList.remove('done'));
-  const c2m=document.getElementById('inp-cardio2-min');
-  const c2h=document.getElementById('inp-cardio2-hr');
-  const c2k=document.getElementById('inp-cardio2-kcal');
-  if(c2m)c2m.value='';if(c2h)c2h.value='';if(c2k)c2k.value='';
-  document.getElementById('inp-cardio-type-custom').value='';
-  document.getElementById('inp-cardio-type-custom').style.display='none';
-  selectedCardioType='';
-  document.querySelectorAll('#cardio-type-row .rt-btn').forEach(b=>b.classList.remove('done'));
-  document.getElementById('inp-strength').value='';
-  document.getElementById('inp-book-memo').value='';
-  todayBookMemoLines=[];
-  const linesBox=document.getElementById('book-memo-lines');
-  if(linesBox)linesBox.style.display='none';
-  selectedBookIds=new Set();
-  buildBookSelectArea();
-  ['breakfast','lunch','dinner','snack'].forEach(k=>{
-    document.getElementById('inp-'+k).value='';
-    const kcalEl=document.getElementById('inp-'+k+'-kcal');
-    const proteinEl=document.getElementById('inp-'+k+'-protein');
-    if(kcalEl)kcalEl.value='';
-    if(proteinEl)proteinEl.value='';
-  });
-  document.getElementById('inp-intake-kcal').value='';
-  document.getElementById('inp-intake-protein').value='';
-  document.getElementById('inp-burn-kcal').value='';
   document.getElementById('inp-text').value='';
   document.getElementById('inp-place').value='';
   document.getElementById('inp-link').value='';
   document.getElementById('sync-status-wrap').style.display='none';
   document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('on'));
   buildRoutineEditor({});
-  resetOneThing();
-  calculateIntakeKcal();
   if(id){
     editingId=id;
     const e=entries.find(x=>x.id===id);
@@ -1575,43 +1564,12 @@ function openModal(id){
     document.getElementById('inp-weight').value=e.weight||'';
     document.getElementById('inp-muscle').value=e.muscle||'';
     document.getElementById('inp-fat').value=e.fat||'';
-    // inp-protein removed
-    document.getElementById('inp-cardio-min').value=e.cardioMin||'';
-    document.getElementById('inp-cardio-hr').value=e.cardioHr||'';
-    document.getElementById('inp-cardio-kcal').value=e.cardioKcal||'';
-    document.getElementById('inp-steps').value=e.steps||'';
-    selectedCardioType=e.cardioType||'';
-    document.querySelectorAll('#cardio-type-row .rt-btn').forEach(b=>{
-      if(b.textContent.includes(selectedCardioType)&&selectedCardioType) b.classList.add('done');
-    });
-    const custom=document.getElementById('inp-cardio-type-custom');
-    const isCustom=selectedCardioType&&!['수영','홈트','트레킹','러닝','자전거'].includes(selectedCardioType);
-    if(isCustom){custom.value=selectedCardioType;custom.style.display='block';}
-    else{custom.style.display='none';}
-    document.getElementById('inp-strength').value=e.strength||'';
-    document.getElementById('inp-book-memo').value=e.bookMemo||'';
-    selectedBookIds=new Set(e.bookIds||[]);
-    buildBookSelectArea();
-    // inp-food removed
-    ['breakfast','lunch','dinner','snack'].forEach(k=>{
-      document.getElementById('inp-'+k).value=e[k]||'';
-      const kcalEl=document.getElementById('inp-'+k+'-kcal');
-      const proteinEl=document.getElementById('inp-'+k+'-protein');
-      if(kcalEl)kcalEl.value=e[k+'Kcal']||'';
-      if(proteinEl)proteinEl.value=e[k+'Protein']||'';
-    });
-    document.getElementById('inp-intake-kcal').value=e.intakeKcal||'';
-    document.getElementById('inp-intake-protein').value=e.intakeProtein||'';
-    document.getElementById('inp-burn-kcal').value=e.burnKcal||'';
     document.getElementById('inp-text').value=e.text||'';
     document.getElementById('inp-place').value=e.place||'';
     document.getElementById('inp-link').value=e.link||'';
     currentMood=e.mood||'';
     if(e.mood)document.querySelectorAll('.mood-btn').forEach(b=>{if(b.textContent===e.mood)b.classList.add('on');});
     buildRoutineEditor(e.routine||{});
-    document.getElementById('inp-one-thing').value=e.oneThing||'';
-    if(e.oneThingDone===true) setOneThingDone(true);
-    else if(e.oneThingDone===false) setOneThingDone(false);
   }
   document.getElementById('write-modal').style.display='flex';
 }
@@ -1679,66 +1637,16 @@ function saveEntry(){
   const entry={
     id:editingId||genId(),date,mood:currentMood,
     routine:{...routineState},
-    oneThing:document.getElementById('inp-one-thing').value,
-    oneThingDone:oneThingDone,
     weight:document.getElementById('inp-weight').value,
     muscle:document.getElementById('inp-muscle').value,
     fat:document.getElementById('inp-fat').value,
     protein:'',
-    cardioType:(selectedCardioType==='기타'?document.getElementById('inp-cardio-type-custom').value:selectedCardioType),
-    cardioMin:document.getElementById('inp-cardio-min').value,
-    cardioHr:document.getElementById('inp-cardio-hr').value,
-    cardioKcal:document.getElementById('inp-cardio-kcal').value,
-    cardio2Type:selectedCardioType2,
-    cardio2Min:document.getElementById('inp-cardio2-min')?.value||'',
-    cardio2Hr:document.getElementById('inp-cardio2-hr')?.value||'',
-    cardio2Kcal:document.getElementById('inp-cardio2-kcal')?.value||'',
-    burnKcal:document.getElementById('inp-burn-kcal').value,
-    steps:document.getElementById('inp-steps').value,
-    strength:document.getElementById('inp-strength').value,
-    bookIds:[...selectedBookIds],
-    bookMemo:document.getElementById('inp-book-memo').value,
-    breakfast:document.getElementById('inp-breakfast').value,
-    lunch:document.getElementById('inp-lunch').value,
-    dinner:document.getElementById('inp-dinner').value,
-    snack:document.getElementById('inp-snack').value,
-    breakfastKcal:document.getElementById('inp-breakfast-kcal')?.value||'',
-    breakfastProtein:document.getElementById('inp-breakfast-protein')?.value||'',
-    lunchKcal:document.getElementById('inp-lunch-kcal')?.value||'',
-    lunchProtein:document.getElementById('inp-lunch-protein')?.value||'',
-    dinnerKcal:document.getElementById('inp-dinner-kcal')?.value||'',
-    dinnerProtein:document.getElementById('inp-dinner-protein')?.value||'',
-    snackKcal:document.getElementById('inp-snack-kcal')?.value||'',
-    snackProtein:document.getElementById('inp-snack-protein')?.value||'',
-    intakeKcal:document.getElementById('inp-intake-kcal').value,
-    intakeProtein:document.getElementById('inp-intake-protein').value,
-    burnKcal:document.getElementById('inp-burn-kcal').value,
     food:'',
     text:document.getElementById('inp-text').value,
     place:document.getElementById('inp-place').value,
     link:document.getElementById('inp-link').value,
     updatedAt:Date.now()
   };
-  const inputMemo=document.getElementById('inp-book-memo').value.trim();
-  if(inputMemo) todayBookMemoLines.push(inputMemo);
-  const newMemo=todayBookMemoLines.filter(Boolean).join('\n');
-  const existingMemo=editingId?(entries.find(e=>e.id===editingId)||{}).bookMemo||'':'';
-  entry.bookMemo=newMemo||existingMemo;
-
-  // 새 일기 작성할 때만 book.notes에 추가 (수정 모드에서는 중복 추가 안 함)
-  if(!editingId && newMemo && selectedBookIds.size>0){
-    const d=new Date();
-    const datePrefix='['+(d.getMonth()+1)+'/'+d.getDate()+'] ';
-    [...selectedBookIds].forEach(bid=>{
-      const book=books.find(b=>b.id===bid);
-      if(book) book.notes=(book.notes?book.notes+' | ':'')+datePrefix+newMemo;
-    });
-    saveBooks();
-  }
-
-
-
-
   if(editingId)entries=entries.map(e=>e.id===editingId?entry:e);
   else entries.push(entry);
   save();
@@ -1785,7 +1693,7 @@ function saveSheetsUrl(){
 
 function routineDisplayHTML(routine){
   if(!routine||!Object.keys(routine).length)return'';
-  const allItems=ROUTINE_GROUPS.flatMap(g=>g.items.map(i=>({...i,group:g.label})));
+  const allItems=routineItems;
   const done=allItems.filter(i=>routine[i.id]==='done');
   const skip=allItems.filter(i=>routine[i.id]==='skip');
   if(!done.length&&!skip.length)return'';
@@ -2016,7 +1924,7 @@ function renderStats(){
   const muscleChange=latestMuscle&&prevMuscle?(latestMuscle-prevMuscle).toFixed(1):null;
 
   // 루틴 달성률
-  const allRoutineItems=ROUTINE_GROUPS.flatMap(g=>g.items);
+  const allRoutineItems=routineItems;
   const routineStats=allRoutineItems.map(item=>{
     const applicable=sorted.filter(e=>e.routine&&e.routine[item.id]);
     const done=sorted.filter(e=>e.routine&&e.routine[item.id]==='done');
@@ -2212,9 +2120,18 @@ function renderSettings(){
         <button class="btn-outline red" style="margin-top:4px;" onclick="SHEETS_URL='';localStorage.removeItem('${DB_SHEETS}');renderSettings();">연동 해제</button>`:''}
     </div>
     <div class="setting-card">
-      <div class="setting-title">📚 책 목록</div>
-      ${bookListHtml}
-      <button class="btn-outline" style="margin-top:12px;" onclick="openAddBookModal()">+ 새 책 등록</button>
+      <div class="setting-title">🔄 루틴 관리</div>
+      <div class="setting-note">아침/일과/8코어/저녁 루틴 항목을 추가하거나 삭제할 수 있어요.</div>
+      ${ROUTINE_GROUP_DEFS.map(g=>`
+        <div style="margin-bottom:14px;">
+          <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:6px;">${g.label}</div>
+          ${routineItemsByGroup(g.id).map(it=>`<div class="cat-manage-row"><span>${esc(it.label)}</span><button onclick="deleteRoutineItem('${it.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></div>`).join('')}
+          <div style="display:flex;gap:6px;margin-top:8px;">
+            <input type="text" id="inp-new-routine-${g.id}" placeholder="예) 🧘 명상" style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+            <button onclick="addRoutineItem('${g.id}',document.getElementById('inp-new-routine-${g.id}').value);document.getElementById('inp-new-routine-${g.id}').value=''" style="padding:7px 12px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
+          </div>
+        </div>
+      `).join('')}
     </div>
     <div class="setting-card">
       <div class="setting-title">⏱ 타임 카테고리 관리</div>
