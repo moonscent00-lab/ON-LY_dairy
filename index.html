@@ -186,7 +186,7 @@ input[type=number]{-moz-appearance:textfield;}
 .task-add-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:14px;margin-bottom:16px;}
 .task-add-row{display:flex;gap:6px;margin-bottom:8px;}
 .task-add-row:last-child{margin-bottom:0;}
-.priority-btn{flex:1;padding:7px 4px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--bg);font-size:12px;color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.priority-btn{flex:1;padding:5px 2px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--bg);font-size:10px;color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;}
 .priority-btn.on-high{background:#fce8e8;color:var(--danger);border-color:var(--danger);}
 .priority-btn.on-mid{background:#fff1e3;color:var(--accent2);border-color:var(--accent2);}
 .priority-btn.on-low{background:var(--bg);color:var(--text2);border-color:var(--border2);font-weight:600;}
@@ -1300,7 +1300,7 @@ const DEFAULT_PIPELINES=[
   {name:'슈가펫',color:'#2D6A4F'}
 ];
 const PIPELINE_PALETTE=['#7B5EA7','#457B9D','#E76F51','#2D6A4F','#E9C46A','#264653','#8AB17D','#E63946'];
-const PRIORITY_LABEL={high:'상',mid:'중',low:'하'};
+const PRIORITY_LABEL={high:'원씽',mid:'넥스트씽',low:'그 외'};
 const PRIORITY_COLOR={high:'var(--danger)',mid:'var(--accent2)',low:'var(--text3)'};
 const PRIORITY_RANK={high:0,mid:1,low:2};
 
@@ -1475,16 +1475,16 @@ function renderTasksTab(){
   </div>`;
 
   const addCard=`<div class="task-add-card">
-    <div class="task-add-row">
-      <input type="text" id="task-title-input" placeholder="할일 입력..." style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-    </div>
     <div class="pipeline-select-row">
       ${pipelines.map(p=>`<button class="pipeline-select-btn ${taskAddPipelineId===p.id?'on':''}" style="${taskAddPipelineId===p.id?'background:'+p.color+';':''}" onclick="setTaskAddPipeline('${p.id}')">${esc(p.name)}</button>`).join('')}
     </div>
     <div class="task-add-row">
-      <button class="priority-btn ${taskAddPriority==='high'?'on-high':''}" onclick="setTaskAddPriority('high')">🔴 상</button>
-      <button class="priority-btn ${taskAddPriority==='mid'?'on-mid':''}" onclick="setTaskAddPriority('mid')">🟠 중</button>
-      <button class="priority-btn ${taskAddPriority==='low'?'on-low':''}" onclick="setTaskAddPriority('low')">⚪ 하</button>
+      <input type="text" id="task-title-input" placeholder="할일 입력..." style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+    </div>
+    <div class="task-add-row">
+      <button class="priority-btn ${taskAddPriority==='high'?'on-high':''}" onclick="setTaskAddPriority('high')">🎯 원씽</button>
+      <button class="priority-btn ${taskAddPriority==='mid'?'on-mid':''}" onclick="setTaskAddPriority('mid')">➡️ 넥스트씽</button>
+      <button class="priority-btn ${taskAddPriority==='low'?'on-low':''}" onclick="setTaskAddPriority('low')">📌 그 외</button>
       <button onclick="addTaskFromForm()" style="padding:8px 18px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
     </div>
   </div>`;
