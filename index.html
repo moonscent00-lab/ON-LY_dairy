@@ -186,10 +186,13 @@ input[type=number]{-moz-appearance:textfield;}
 .task-add-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:14px;margin-bottom:16px;}
 .task-add-row{display:flex;gap:6px;margin-bottom:8px;}
 .task-add-row:last-child{margin-bottom:0;}
-.priority-btn{flex:1;padding:5px 2px;border-radius:var(--r-sm);border:1px solid var(--border2);background:var(--bg);font-size:10px;color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;}
-.priority-btn.on-high{background:#fce8e8;color:var(--danger);border-color:var(--danger);}
-.priority-btn.on-mid{background:#fff1e3;color:var(--accent2);border-color:var(--accent2);}
-.priority-btn.on-low{background:var(--bg);color:var(--text2);border-color:var(--border2);font-weight:600;}
+.priority-btn{flex:1;padding:5px 2px;border-radius:var(--r-sm);font-size:10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;border:1.5px solid transparent;}
+.priority-btn.p-high{background:#fce8e8;color:var(--danger);border-color:#f2b3ba;}
+.priority-btn.p-mid{background:#fff1e3;color:var(--accent2);border-color:#f5cfa0;}
+.priority-btn.p-low{background:#eceef1;color:var(--text2);border-color:#d3d7dc;}
+.priority-btn.p-high.selected{background:var(--danger);color:#fff;border-color:var(--danger);}
+.priority-btn.p-mid.selected{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.priority-btn.p-low.selected{background:var(--text2);color:#fff;border-color:var(--text2);}
 .pipeline-select-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
 .pipeline-select-btn{padding:5px 10px;border-radius:20px;font-size:11px;border:1.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
 .pipeline-select-btn.on{color:#fff;border-color:transparent;}
@@ -1300,7 +1303,7 @@ const DEFAULT_PIPELINES=[
   {name:'슈가펫',color:'#2D6A4F'}
 ];
 const PIPELINE_PALETTE=['#7B5EA7','#457B9D','#E76F51','#2D6A4F','#E9C46A','#264653','#8AB17D','#E63946'];
-const PRIORITY_LABEL={high:'원씽',mid:'넥스트씽',low:'그 외'};
+const PRIORITY_LABEL={high:'One Thing',mid:'Next Thing',low:'Etc Thing'};
 const PRIORITY_COLOR={high:'var(--danger)',mid:'var(--accent2)',low:'var(--text3)'};
 const PRIORITY_RANK={high:0,mid:1,low:2};
 
@@ -1482,9 +1485,9 @@ function renderTasksTab(){
       <input type="text" id="task-title-input" placeholder="할일 입력..." style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
     </div>
     <div class="task-add-row">
-      <button class="priority-btn ${taskAddPriority==='high'?'on-high':''}" onclick="setTaskAddPriority('high')">🎯 원씽</button>
-      <button class="priority-btn ${taskAddPriority==='mid'?'on-mid':''}" onclick="setTaskAddPriority('mid')">➡️ 넥스트씽</button>
-      <button class="priority-btn ${taskAddPriority==='low'?'on-low':''}" onclick="setTaskAddPriority('low')">📌 그 외</button>
+      <button class="priority-btn p-high ${taskAddPriority==='high'?'selected':''}" onclick="setTaskAddPriority('high')">🎯 One Thing</button>
+      <button class="priority-btn p-mid ${taskAddPriority==='mid'?'selected':''}" onclick="setTaskAddPriority('mid')">➡️ Next Thing</button>
+      <button class="priority-btn p-low ${taskAddPriority==='low'?'selected':''}" onclick="setTaskAddPriority('low')">📌 Etc Thing</button>
       <button onclick="addTaskFromForm()" style="padding:8px 18px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
     </div>
   </div>`;
