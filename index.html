@@ -273,19 +273,15 @@ input[type=number]{-moz-appearance:textfield;}
     <button onclick="closeWriteModal()" style="border:none;background:none;font-size:22px;color:var(--text3);cursor:pointer;padding:0 4px;line-height:1;">×</button>
   </div>
 
-  <!-- 날짜 -->
-  <div class="field">
-    <input type="date" id="inp-date" style="width:100%;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
-  </div>
-
-  <!-- 기분 -->
-  <div style="display:flex;gap:4px;margin-bottom:14px;">
-    <button class="mood-btn" onclick="setMood('❤️',this)" style="padding:8px 4px;font-size:18px;">❤️</button>
-    <button class="mood-btn" onclick="setMood('☀️',this)" style="padding:8px 4px;font-size:18px;">☀️</button>
-    <button class="mood-btn" onclick="setMood('🌈',this)" style="padding:8px 4px;font-size:18px;">🌈</button>
-    <button class="mood-btn" onclick="setMood('✨',this)" style="padding:8px 4px;font-size:18px;">✨</button>
-    <button class="mood-btn" onclick="setMood('☔️',this)" style="padding:8px 4px;font-size:18px;">☔️</button>
-    <button class="mood-btn" onclick="setMood('⚡️',this)" style="padding:8px 4px;font-size:18px;">⚡️</button>
+  <!-- 날짜 + 기분 -->
+  <div style="display:flex;gap:6px;align-items:center;margin-bottom:14px;">
+    <input type="date" id="inp-date" style="flex:1.4;min-width:0;padding:8px 6px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+    <button class="mood-btn" onclick="setMood('❤️',this)" style="padding:5px 2px;font-size:14px;">❤️</button>
+    <button class="mood-btn" onclick="setMood('☀️',this)" style="padding:5px 2px;font-size:14px;">☀️</button>
+    <button class="mood-btn" onclick="setMood('🌈',this)" style="padding:5px 2px;font-size:14px;">🌈</button>
+    <button class="mood-btn" onclick="setMood('✨',this)" style="padding:5px 2px;font-size:14px;">✨</button>
+    <button class="mood-btn" onclick="setMood('☔️',this)" style="padding:5px 2px;font-size:14px;">☔️</button>
+    <button class="mood-btn" onclick="setMood('⚡️',this)" style="padding:5px 2px;font-size:14px;">⚡️</button>
   </div>
 
   <!-- 루틴 체크 -->
