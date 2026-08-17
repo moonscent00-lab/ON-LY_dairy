@@ -730,6 +730,25 @@ async function deleteRoutineItem(id){
   renderSettings();
 }
 
+async function editRoutineItem(id){
+  const item=routineItems.find(r=>r.id===id);
+  if(!item)return;
+  const newLabel=prompt('루틴 이름을 수정하세요 (이모지 포함)', item.label);
+  if(newLabel===null)return;
+  const trimmed=newLabel.trim();
+  if(!trimmed)return;
+  item.label=trimmed;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/routine_items?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({label:trimmed})
+    });
+    showToast('✅ 수정됨');
+  }catch(e){showToast('⚠️ 동기화 실패',true);}
+  renderSettings();
+}
+
 let entries=[];
 let editingId=null;
 let currentMood='';
@@ -2125,7 +2144,7 @@ function renderSettings(){
       ${ROUTINE_GROUP_DEFS.map(g=>`
         <div style="margin-bottom:14px;">
           <div style="font-size:12px;color:var(--text2);font-weight:500;margin-bottom:6px;">${g.label}</div>
-          ${routineItemsByGroup(g.id).map(it=>`<div class="cat-manage-row"><span>${esc(it.label)}</span><button onclick="deleteRoutineItem('${it.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></div>`).join('')}
+          ${routineItemsByGroup(g.id).map(it=>`<div class="cat-manage-row"><span>${esc(it.label)}</span><span style="display:flex;gap:4px;"><button onclick="editRoutineItem('${it.id}')" style="font-size:11px;padding:3px 8px;border:1px solid var(--border2);border-radius:20px;background:none;color:var(--text2);cursor:pointer;">수정</button><button onclick="deleteRoutineItem('${it.id}')" style="font-size:11px;padding:3px 8px;border:1px solid #fcc;border-radius:20px;background:none;color:var(--danger);cursor:pointer;">삭제</button></span></div>`).join('')}
           <div style="display:flex;gap:6px;margin-top:8px;">
             <input type="text" id="inp-new-routine-${g.id}" placeholder="예) 🧘 명상" style="flex:1;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
             <button onclick="addRoutineItem('${g.id}',document.getElementById('inp-new-routine-${g.id}').value);document.getElementById('inp-new-routine-${g.id}').value=''" style="padding:7px 12px;background:var(--text);color:#fff;border:none;border-radius:var(--r-sm);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
