@@ -1341,18 +1341,32 @@ async function renderTimerTab(){
       const st=new Date(s.start_time), et=new Date(s.end_time);
       const stStr=`${String(st.getHours()).padStart(2,'0')}:${String(st.getMinutes()).padStart(2,'0')}`;
       const etStr=`${String(et.getHours()).padStart(2,'0')}:${String(et.getMinutes()).padStart(2,'0')}`;
-      return`<div class="timeline-block" onclick="editSessionMemo('${s.id}')" style="cursor:pointer;">
+      return`<div class="timeline-block">
         <span class="timeline-dot" style="background:${color}"></span>
-        <div class="timeline-info">
+        <div class="timeline-info" onclick="editSessionMemo('${s.id}')" style="cursor:pointer;">
           <div class="timeline-cat" style="color:${color}">${esc(s.category_name||'')}</div>
           <div class="timeline-time">${stStr} ~ ${etStr}</div>
           ${s.memo?`<div style="font-size:11px;color:var(--text2);margin-top:3px;">📝 ${esc(s.memo)}</div>`:'<div style="font-size:11px;color:var(--text3);margin-top:3px;">+ 메모 추가</div>'}
         </div>
         <div class="timeline-dur">${s.duration_min}분</div>
+        <button onclick="deleteSession('${s.id}')" style="border:none;background:none;color:var(--text3);font-size:16px;cursor:pointer;padding:2px 4px;flex-shrink:0;">×</button>
       </div>`;
     }).join('');
     return`<div class="timeline-day"><div class="timeline-date">${fmtDate(d)} (${getWd(d)})</div>${rows}</div>`;
   }).join('');
+}
+
+async function deleteSession(id){
+  if(!confirm('이 기록을 삭제할까요?'))return;
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_sessions?id=eq.${id}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    if(res.ok)showToast('✅ 삭제됨');
+    else showToast('⚠️ 삭제 실패 ('+res.status+')',true);
+  }catch(e){showToast('⚠️ 삭제 실패',true);}
+  renderTimerTab();
 }
 
 async function editSessionMemo(sessionId){
