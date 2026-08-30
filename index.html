@@ -600,50 +600,60 @@ async function loadFromSupabase() {
   const data = await supa.getAll();
   hideLoadingOverlay();
   if(!data) { showToast('⚠️ 동기화 실패 — 로컬 데이터로 표시합니다', true); return false; }
-  entries = data.map(r => ({
-    id: r.id,
-    date: r.date,
-    mood: r.mood||'',
-    oneThing: r.one_thing||'',
-    oneThingDone: r.one_thing_done===null?null:r.one_thing_done,
-    weight: r.weight||'',
-    muscle: r.muscle||'',
-    fat: r.fat||'',
-    protein: r.protein||'',
-    breakfast: r.breakfast||'',
-    lunch: r.lunch||'',
-    dinner: r.dinner||'',
-    snack: r.snack||'',
-    breakfastKcal: r.breakfast_kcal||'',
-    breakfastProtein: r.breakfast_protein||'',
-    lunchKcal: r.lunch_kcal||'',
-    lunchProtein: r.lunch_protein||'',
-    dinnerKcal: r.dinner_kcal||'',
-    dinnerProtein: r.dinner_protein||'',
-    snackKcal: r.snack_kcal||'',
-    snackProtein: r.snack_protein||'',
-    intakeKcal: r.intake_kcal||'',
-    intakeProtein: r.intake_protein||'',
-    intakeCarb: r.intake_carb||'',
-    intakeFat: r.intake_fat||'',
-    burnKcal: r.burn_kcal||'',
-    cardioType: r.cardio_type||'',
-    cardioMin: r.cardio_min||'',
-    cardioHr: r.cardio_hr||'',
-    cardioKcal: r.cardio_kcal||'',
-    steps: r.steps||'',
-    strength: r.strength||'',
-    food: r.food||'',
-    text: r.text||'',
-    place: r.place||'',
-    link: r.link||'',
-    bookMemo: r.book_memo||'',
-    bookIds: JSON.parse(r.book_ids||'[]'),
-    routine: JSON.parse(r.routine||'{}'),
-    updatedAt: new Date(r.updated_at).getTime()
-  }));
-  saveLocal();
-  await loadBooksFromSupabase();
+  try{
+    entries = data.map(r => {
+      let bookIds=[]; let routine={};
+      try{ bookIds=JSON.parse(r.book_ids||'[]'); }catch(e){ bookIds=[]; }
+      try{ routine=JSON.parse(r.routine||'{}'); }catch(e){ routine={}; }
+      return {
+        id: r.id,
+        date: r.date,
+        mood: r.mood||'',
+        oneThing: r.one_thing||'',
+        oneThingDone: r.one_thing_done===null?null:r.one_thing_done,
+        weight: r.weight||'',
+        muscle: r.muscle||'',
+        fat: r.fat||'',
+        protein: r.protein||'',
+        breakfast: r.breakfast||'',
+        lunch: r.lunch||'',
+        dinner: r.dinner||'',
+        snack: r.snack||'',
+        breakfastKcal: r.breakfast_kcal||'',
+        breakfastProtein: r.breakfast_protein||'',
+        lunchKcal: r.lunch_kcal||'',
+        lunchProtein: r.lunch_protein||'',
+        dinnerKcal: r.dinner_kcal||'',
+        dinnerProtein: r.dinner_protein||'',
+        snackKcal: r.snack_kcal||'',
+        snackProtein: r.snack_protein||'',
+        intakeKcal: r.intake_kcal||'',
+        intakeProtein: r.intake_protein||'',
+        intakeCarb: r.intake_carb||'',
+        intakeFat: r.intake_fat||'',
+        burnKcal: r.burn_kcal||'',
+        cardioType: r.cardio_type||'',
+        cardioMin: r.cardio_min||'',
+        cardioHr: r.cardio_hr||'',
+        cardioKcal: r.cardio_kcal||'',
+        steps: r.steps||'',
+        strength: r.strength||'',
+        food: r.food||'',
+        text: r.text||'',
+        place: r.place||'',
+        link: r.link||'',
+        bookMemo: r.book_memo||'',
+        bookIds: bookIds,
+        routine: routine,
+        updatedAt: r.updated_at?new Date(r.updated_at).getTime():Date.now()
+      };
+    });
+    saveLocal();
+  }catch(e){
+    showToast('⚠️ 일부 일기 데이터를 불러오지 못했어요',true);
+    console.error('loadFromSupabase mapping error', e);
+  }
+  try{ await loadBooksFromSupabase(); }catch(e){}
   showToast('✅ 최신 데이터로 갱신됐어요');
   return true;
 }
@@ -1735,19 +1745,20 @@ async function initApp(){
   document.getElementById('nav-today').textContent=`${today.getMonth()+1}월 ${today.getDate()}일 ${WEEKDAYS[today.getDay()]}`;
   renderCalendar();
   renderEntries();
-  const ok = await loadFromSupabase();
-  if(ok){renderCalendar();renderEntries();}
-  await loadCategories();
-  await loadActiveSession();
-  await loadPipelines();
-  await loadTasks();
-  await loadRoutineItems();
+  try{
+    const ok = await loadFromSupabase();
+    if(ok){renderCalendar();renderEntries();}
+  }catch(e){console.error('loadFromSupabase failed',e);}
+  try{ await loadCategories(); }catch(e){console.error('loadCategories failed',e);}
+  try{ await loadActiveSession(); }catch(e){console.error('loadActiveSession failed',e);}
+  try{ await loadPipelines(); }catch(e){console.error('loadPipelines failed',e);}
+  try{ await loadTasks(); }catch(e){console.error('loadTasks failed',e);}
+  try{ await loadRoutineItems(); }catch(e){console.error('loadRoutineItems failed',e);}
   // 로딩 도중 다른 탭을 눌러도 반영되도록 전체 탭 다시 그리기
-  renderTimerTab();
-  renderTasksTab();
-  if(document.getElementById('reading-content'))renderReadingTab();
-  renderCalendar();
-  renderEntries();
+  try{ renderTimerTab(); }catch(e){console.error('renderTimerTab failed',e);}
+  try{ renderTasksTab(); }catch(e){console.error('renderTasksTab failed',e);}
+  try{ if(document.getElementById('reading-content'))renderReadingTab(); }catch(e){console.error('renderReadingTab failed',e);}
+  try{ renderCalendar(); renderEntries(); }catch(e){console.error('renderEntries failed',e);}
 }
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
 function fmtDate(ds){const d=new Date(ds+'T00:00:00');return`${d.getMonth()+1}월 ${d.getDate()}일`;}
