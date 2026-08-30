@@ -1742,7 +1742,12 @@ async function initApp(){
   await loadPipelines();
   await loadTasks();
   await loadRoutineItems();
+  // 로딩 도중 다른 탭을 눌러도 반영되도록 전체 탭 다시 그리기
   renderTimerTab();
+  renderTasksTab();
+  if(document.getElementById('reading-content'))renderReadingTab();
+  renderCalendar();
+  renderEntries();
 }
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
 function fmtDate(ds){const d=new Date(ds+'T00:00:00');return`${d.getMonth()+1}월 ${d.getDate()}일`;}
