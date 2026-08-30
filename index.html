@@ -1225,7 +1225,7 @@ async function loadActiveSession(){
 
 async function loadSessions(){
   try{
-    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_sessions?end_time=not.is.null&order=start_time.desc&limit=150`,{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/time_sessions?end_time=not.is.null&order=start_time.desc&limit=1000`,{
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
     });
     if(res.ok) return await res.json();
@@ -1296,6 +1296,58 @@ function formatElapsed(ms){
   return h>0?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`;
 }
 
+let timerViewMode='list';
+let timerCalYear=today.getFullYear();
+let timerCalMonth=today.getMonth();
+let timerSelectedDate=null;
+
+function toggleTimerView(){
+  timerViewMode=timerViewMode==='calendar'?'list':'calendar';
+  if(timerViewMode==='list') timerSelectedDate=null;
+  renderTimerTab();
+}
+
+function timerCalMove(dir){
+  timerCalMonth+=dir;
+  if(timerCalMonth>11){timerCalMonth=0;timerCalYear++;}
+  if(timerCalMonth<0){timerCalMonth=11;timerCalYear--;}
+  renderTimerTab();
+}
+
+function selectTimerCalDate(dateStr){
+  timerSelectedDate=timerSelectedDate===dateStr?null:dateStr;
+  renderTimerTab();
+}
+
+function renderTimerCalendar(sessions){
+  const titleEl=document.getElementById('timer-cal-title');
+  const grid=document.getElementById('timer-cal-grid');
+  if(!titleEl||!grid)return;
+  titleEl.textContent=`${timerCalYear}년 ${timerCalMonth+1}월`;
+  const sessionDates=new Set(sessions.map(s=>s.date||(s.start_time||'').slice(0,10)));
+  const firstDay=new Date(timerCalYear,timerCalMonth,1).getDay();
+  const lastDate=new Date(timerCalYear,timerCalMonth+1,0).getDate();
+  const todayStr=today.toISOString().slice(0,10);
+  let html='';
+  for(let i=0;i<firstDay;i++) html+=`<div></div>`;
+  for(let d=1;d<=lastDate;d++){
+    const dateStr=`${timerCalYear}-${String(timerCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasSession=sessionDates.has(dateStr);
+    const isToday=dateStr===todayStr;
+    const isSelected=dateStr===timerSelectedDate;
+    html+=`<div onclick="selectTimerCalDate('${dateStr}')" style="
+      text-align:center;padding:6px 2px;border-radius:8px;cursor:pointer;font-size:13px;
+      background:${isSelected?'var(--text)':isToday?'var(--accent-light)':'none'};
+      color:${isSelected?'#fff':isToday?'var(--accent)':'var(--text)'};
+      font-weight:${isToday||isSelected?'600':'400'};
+      position:relative;">
+      ${d}
+      ${hasSession?`<div style="width:5px;height:5px;border-radius:50%;background:${isSelected?'#fff':'var(--accent)'};margin:2px auto 0;"></div>`:'<div style="height:7px;"></div>'}
+    </div>`;
+  }
+  grid.innerHTML=html;
+}
+
 async function renderTimerTab(){
   const c=document.getElementById('timer-content');
   if(!c)return;
@@ -1320,7 +1372,29 @@ async function renderTimerTab(){
         </div>
       </div>`;
   }
-  c.innerHTML=heroHtml+'<div id="timer-timeline" style="text-align:center;color:var(--text3);font-size:13px;padding:20px;">불러오는 중...</div>';
+
+  const toggleHtml=`<div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+    <button onclick="toggleTimerView()" style="padding:6px 12px;border:1px solid var(--border2);border-radius:20px;font-size:12px;background:var(--surface);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">${timerViewMode==='calendar'?'📋 리스트':'📅 날짜별'}</button>
+  </div>
+  <div id="timer-calendar-view" style="display:${timerViewMode==='calendar'?'block':'none'};background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <button onclick="timerCalMove(-1)" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--text2);">‹</button>
+      <div id="timer-cal-title" style="font-family:'Noto Serif KR',serif;font-size:16px;font-weight:600;"></div>
+      <button onclick="timerCalMove(1)" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--text2);">›</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;">
+      <div style="text-align:center;font-size:11px;color:var(--danger);">일</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);">월</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);">화</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);">수</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);">목</div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);">금</div>
+      <div style="text-align:center;font-size:11px;color:var(--danger);">토</div>
+    </div>
+    <div id="timer-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;"></div>
+  </div>`;
+
+  c.innerHTML=heroHtml+toggleHtml+'<div id="timer-timeline" style="text-align:center;color:var(--text3);font-size:13px;padding:20px;">불러오는 중...</div>';
 
   if(activeSession){
     const startMs=new Date(activeSession.startTime).getTime();
@@ -1339,13 +1413,18 @@ async function renderTimerTab(){
     if(!byDate[d])byDate[d]=[];
     byDate[d].push(s);
   });
-  const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a)).slice(0,14);
+
+  if(timerViewMode==='calendar') renderTimerCalendar(sessions);
+
+  const dates=timerSelectedDate
+    ? (byDate[timerSelectedDate]?[timerSelectedDate]:[])
+    : Object.keys(byDate).sort((a,b)=>b.localeCompare(a)).slice(0,14);
 
   const timelineEl=document.getElementById('timer-timeline');
   if(!timelineEl)return;
   if(!dates.length){
     timelineEl.className='';
-    timelineEl.innerHTML=`<div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-text">아직 기록이 없어요.</div></div>`;
+    timelineEl.innerHTML=`<div class="empty-state"><div class="empty-icon">⏱</div><div class="empty-text">${timerSelectedDate?'이 날의 기록이 없어요.':'아직 기록이 없어요.'}</div></div>`;
     return;
   }
   timelineEl.className='';
