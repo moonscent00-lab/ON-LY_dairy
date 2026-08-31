@@ -1748,17 +1748,17 @@ async function initApp(){
   try{
     const ok = await loadFromSupabase();
     if(ok){renderCalendar();renderEntries();}
-  }catch(e){console.error('loadFromSupabase failed',e);}
-  try{ await loadCategories(); }catch(e){console.error('loadCategories failed',e);}
-  try{ await loadActiveSession(); }catch(e){console.error('loadActiveSession failed',e);}
-  try{ await loadPipelines(); }catch(e){console.error('loadPipelines failed',e);}
-  try{ await loadTasks(); }catch(e){console.error('loadTasks failed',e);}
-  try{ await loadRoutineItems(); }catch(e){console.error('loadRoutineItems failed',e);}
+  }catch(e){console.error('loadFromSupabase failed',e);showErrorBanner('loadFromSupabase: '+e.message);}
+  try{ await loadCategories(); }catch(e){console.error('loadCategories failed',e);showErrorBanner('loadCategories: '+e.message);}
+  try{ await loadActiveSession(); }catch(e){console.error('loadActiveSession failed',e);showErrorBanner('loadActiveSession: '+e.message);}
+  try{ await loadPipelines(); }catch(e){console.error('loadPipelines failed',e);showErrorBanner('loadPipelines: '+e.message);}
+  try{ await loadTasks(); }catch(e){console.error('loadTasks failed',e);showErrorBanner('loadTasks: '+e.message);}
+  try{ await loadRoutineItems(); }catch(e){console.error('loadRoutineItems failed',e);showErrorBanner('loadRoutineItems: '+e.message);}
   // 로딩 도중 다른 탭을 눌러도 반영되도록 전체 탭 다시 그리기
-  try{ renderTimerTab(); }catch(e){console.error('renderTimerTab failed',e);}
-  try{ renderTasksTab(); }catch(e){console.error('renderTasksTab failed',e);}
-  try{ if(document.getElementById('reading-content'))renderReadingTab(); }catch(e){console.error('renderReadingTab failed',e);}
-  try{ renderCalendar(); renderEntries(); }catch(e){console.error('renderEntries failed',e);}
+  try{ renderTimerTab(); }catch(e){console.error('renderTimerTab failed',e);showErrorBanner('renderTimerTab: '+e.message);}
+  try{ renderTasksTab(); }catch(e){console.error('renderTasksTab failed',e);showErrorBanner('renderTasksTab: '+e.message);}
+  try{ if(document.getElementById('reading-content'))renderReadingTab(); }catch(e){console.error('renderReadingTab failed',e);showErrorBanner('renderReadingTab: '+e.message);}
+  try{ renderCalendar(); renderEntries(); }catch(e){console.error('renderEntries failed',e);showErrorBanner('renderEntries: '+e.message);}
 }
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
 function fmtDate(ds){const d=new Date(ds+'T00:00:00');return`${d.getMonth()+1}월 ${d.getDate()}일`;}
@@ -2554,6 +2554,23 @@ async function reloadFromSheets(){
   if(ok){showToast('✅ 최신 데이터로 갱신됐어요');renderEntries();}
   else{showToast('❌ 시트 연결 실패',true);}
 }
+
+function showErrorBanner(msg){
+  let el=document.getElementById('err-banner');
+  if(!el){
+    el=document.createElement('div');
+    el.id='err-banner';
+    el.style.cssText='position:fixed;top:0;left:0;right:0;background:#E63946;color:#fff;font-size:11px;padding:10px 14px;z-index:9999;white-space:pre-wrap;word-break:break-all;max-height:40vh;overflow-y:auto;font-family:monospace;';
+    document.body.prepend(el);
+  }
+  el.textContent+=(el.textContent?'\n---\n':'')+msg;
+}
+window.addEventListener('error',function(e){
+  showErrorBanner('JS 오류: '+e.message+' ('+(e.filename||'')+':'+(e.lineno||'')+')');
+});
+window.addEventListener('unhandledrejection',function(e){
+  showErrorBanner('비동기 오류: '+(e.reason&&e.reason.message?e.reason.message:e.reason));
+});
 
 initApp();
 </script>
