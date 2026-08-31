@@ -353,6 +353,7 @@ input[type=number]{-moz-appearance:textfield;}
 const DB='only_v1';
 const DB_SHEETS='only_sheets_url';
 const WEEKDAYS=['일','월','화','수','목','금','토'];
+const today=new Date();
 let SHEETS_URL='https://script.google.com/macros/s/AKfycbyQZfPN1wtYYSzwGwUCJ-e9e4xBBkeGLxeg5REenp8aMI2KNBqC16j2G2Mrd2wPBFtvVg/exec';
 
 
@@ -1738,7 +1739,6 @@ function renderTasksTab(){
   c.innerHTML=filterChips+addCard+todoHtml+doneHtml;
 }
 
-const today=new Date();
 async function initApp(){
   loadLocal();
   initDietSelects();
