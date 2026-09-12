@@ -208,6 +208,31 @@ input[type=number]{-moz-appearance:textfield;}
 .task-due.overdue{color:var(--danger);font-weight:500;}
 .task-priority-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .task-del{border:none;background:none;color:var(--text3);font-size:16px;cursor:pointer;padding:2px 4px;flex-shrink:0;}
+
+/* BUDGET TAB */
+.budget-controls{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.budget-controls select{padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);color:var(--text);}
+.budget-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.budget-cat-title{font-size:12px;font-weight:600;color:var(--purple);background:var(--purple-light);padding:8px 12px;border-radius:var(--r-sm);margin:14px 0 6px;}
+.budget-cat-title:first-child{margin-top:0;}
+.budget-item-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border-bottom:1px solid var(--border);font-size:13px;}
+.budget-item-row:last-child{border-bottom:none;}
+.budget-item-name{flex:1.4;min-width:0;color:var(--text);}
+.budget-item-budget{flex:0.9;text-align:right;color:var(--text3);font-size:12px;}
+.budget-item-actual{flex:0.9;}
+.budget-item-actual input{width:100%;text-align:right;padding:6px 8px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:#FFFDF6;}
+.budget-item-actual input:focus{outline:none;border-color:var(--purple);}
+.budget-item-diff{flex:0.9;text-align:right;font-size:12px;font-weight:500;}
+.budget-item-diff.over{color:var(--danger);}
+.budget-item-diff.good{color:var(--accent);}
+.budget-subtotal-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border-radius:var(--r-sm);font-size:12px;font-weight:600;margin-top:2px;}
+.budget-subtotal-row .budget-item-name{flex:1.4;}
+.budget-subtotal-row .budget-item-budget,.budget-subtotal-row .budget-item-actual,.budget-subtotal-row .budget-item-diff{flex:0.9;text-align:right;}
+.budget-grandtotal{display:flex;align-items:center;gap:8px;padding:14px 12px;background:var(--purple-light);border-radius:var(--r);font-size:14px;font-weight:700;color:var(--purple);margin-top:16px;}
+.budget-grandtotal .budget-item-name{flex:1.4;}
+.budget-grandtotal .budget-item-budget,.budget-grandtotal .budget-item-actual,.budget-grandtotal .budget-item-diff{flex:0.9;text-align:right;}
+.budget-card-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.budget-card-row:last-child{border-bottom:none;}
 </style>
 </head>
 <body>
@@ -221,6 +246,7 @@ input[type=number]{-moz-appearance:textfield;}
     <button class="nav-tab" onclick="showTab('diary',this)">📔 다이어리</button>
     <button class="nav-tab" onclick="showTab('tasks',this)">🎯 원씽</button>
     <button class="nav-tab" onclick="showTab('reading',this)">📖 독서</button>
+    <button class="nav-tab" onclick="showTab('budget',this)">💰 가계부</button>
     <button class="nav-tab" onclick="showTab('stats',this)">📊 통계</button>
     <button class="nav-tab" onclick="showTab('settings',this)">⚙️ 설정</button>
   </div>
@@ -259,6 +285,7 @@ input[type=number]{-moz-appearance:textfield;}
 <div class="main" id="main-timer"><div id="timer-content"></div></div>
 <div class="main" id="main-tasks" style="display:none"><div id="tasks-content"></div></div>
 <div class="main" id="main-reading" style="display:none"><div id="reading-content"></div></div>
+<div class="main" id="main-budget" style="display:none"><div id="budget-content"></div></div>
 <div class="main" id="main-stats" style="display:none">
   <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
     <button onclick="captureStats()" style="padding:7px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📸 이미지로 저장</button>
@@ -1739,6 +1766,289 @@ function renderTasksTab(){
   c.innerHTML=filterChips+addCard+todoHtml+doneHtml;
 }
 
+/* ── 가계부 ── */
+const BUDGET_DEFAULT_ITEMS={
+  "가계":[
+    ["① 고정비","건강보험료(지역가입자)",74000,"계좌이체","건강보험공단"],
+    ["① 고정비","연금보험료(지역가입자)",70000,"계좌이체","국민연금공단"],
+    ["① 고정비","주차비",100000,"계좌이체","개인 사유지"],
+    ["① 고정비","전기세(집)",50000,"계좌이체","여름 기준"],
+    ["① 고정비","가스비(집)",50000,"KT카드(국민)","전기세와 서로 충당"],
+    ["① 고정비","인터넷(집)",27500,"KT카드(국민)",""],
+    ["① 고정비","핸드폰(종수 KT)",109500,"KT카드(국민)",""],
+    ["① 고정비","핸드폰(지아 KT)",58580,"KT카드(국민)","요금제 변경"],
+    ["① 고정비","핸드폰(지아 SKT)",29250,"KT카드(국민)","와디즈 요금제"],
+    ["① 고정비","핸드폰(지아 KT M모바일)",2890,"KT카드(국민)","알뜰폰"],
+    ["① 고정비","반려동물 케어(미용·구충제)",80000,"삼성다이소카드",""],
+    ["① 고정비","예비비(여유분)",100000,"해당없음","보험료·통신비 오차 대비"],
+    ["① 고정비","소나타 유류비",200000,"계좌이체","교통비 중 자동차분"],
+    ["① 고정비","하이패스 통행료",100000,"삼성다이소카드","교통비 중 하이패스분"],
+    ["① 고정비","클로드",30000,"KT카드(국민)",""],
+    ["① 고정비","네이버플러스",4900,"KT카드(국민)",""],
+    ["① 고정비","아이클라우드",1100,"KT카드(국민)",""],
+    ["① 고정비","굿네이버스",40000,"KT카드(국민)",""],
+    ["② 보험료","지아 - 삼성생명(팩건강보험)",29160,"계좌이체",""],
+    ["② 보험료","지아 - 삼성화재(모니모전용)",10000,"계좌이체",""],
+    ["② 보험료","지아 - 한화건강보험",115865,"KT카드(국민)",""],
+    ["② 보험료","지아 - 한화 입원수술비보험",62190,"KT카드(국민)",""],
+    ["② 보험료","지아 - DB운전자보험",13940,"계좌이체","역산값"],
+    ["② 보험료","종수 - 라이나생명(치아보험)",50790,"계좌이체",""],
+    ["② 보험료","종수 - 한화(건강보험)",108196,"계좌이체",""],
+    ["② 보험료","종수 - 삼성화재(오토바이운전자)",41000,"계좌이체",""],
+    ["② 보험료","종수 - DB손보(운전자보험)",15810,"계좌이체",""],
+    ["③ 저축","달러종신",495000,"계좌이체","2100달러"],
+    ["④ 식비","식자재",250000,"삼성다이소카드",""],
+    ["④ 식비","어글리어스 구독료",50000,"KT카드(국민)","확인 중"],
+    ["④ 식비","배달",100000,"삼성다이소카드","남는 비용 이월"],
+    ["⑤ 데이트/힐링비","외식+카페(주1회)",200000,"카카오뱅크 모임통장","남는 비용 여행자금 이월"],
+    ["⑥ 종수 용돈","밥값",220000,"카카오뱅크(종수 개인)",""],
+    ["⑥ 종수 용돈","기름값(오토바이)",120000,"카카오뱅크(종수 개인)",""],
+    ["⑥ 종수 용돈","순수 재량비",160000,"카카오뱅크(종수 개인)",""],
+    ["⑦ 지아 용돈","달달샵 월세",150000,"KT카드(국민)",""],
+    ["⑦ 지아 용돈","보험팀 회비",10000,"계좌이체",""],
+    ["⑦ 지아 용돈","지아 대출 원금+이자",210000,"계좌이체",""],
+    ["⑦ 지아 용돈","점심(주1회)",40000,"토스뱅크(지아 체크)",""],
+    ["⑦ 지아 용돈","대중교통비",50000,"토스뱅크 K-패스","월 20% 이상 환급"],
+    ["⑦ 지아 용돈","순수 재량비",140000,"토스뱅크(지아 체크)",""],
+    ["⑧ 건강","영양제(부부, 부모님 몫 제외)",200000,"하나카드(애터미)","PV 수당 반영"],
+    ["⑨ 엄마","헤모힘 1박스",82000,"하나카드(애터미)",""],
+    ["⑨ 엄마","엄마 보험",106421,"계좌이체",""],
+    ["⑨ 엄마","CCTV",33000,"KT카드(국민)",""],
+    ["⑩ 시부모님","헤모힘 1박스",82000,"하나카드(애터미)",""],
+  ],
+  "슈가펫":[
+    ["사입비","로얄캐닌",300000,"삼성BIZ카드(슈가펫)","3개월 평균"],
+    ["사입비","조공",200000,"삼성BIZ카드(슈가펫)",""],
+    ["사입비","하림",200000,"삼성BIZ카드(슈가펫)",""],
+    ["사입비","키코이비즈(오프런)",800000,"삼성BIZ카드(슈가펫)","3개월 평균"],
+    ["고정비","사업대출 원리금(추정)",1100000,"계좌이체","정확한 금액 확인 필요"],
+    ["고정비","공과금 : 전기",130000,"계좌이체","여름기준"],
+    ["고정비","공과금 : 수도세",2500,"계좌이체","2개월 5천원 이내 평균"],
+    ["고정비","키오스크 사용료",86900,"삼성BIZ카드(슈가펫)",""],
+    ["고정비","매장 인터넷",22000,"삼성BIZ카드(슈가펫)",""],
+    ["고정비","매장 CCTV",5500,"삼성BIZ카드(슈가펫)",""],
+  ]
+};
+
+let budgetMonth=null;
+let budgetType='가계';
+let budgetEntries=[];
+
+function budgetWon(n){ return (n||0).toLocaleString('ko-KR')+'원'; }
+function budgetYmNow(){ return `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`; }
+function budgetYmLabel(ym){ const [y,m]=ym.split('-'); return `${y}년 ${parseInt(m)}월`; }
+function budgetNextYm(ym){
+  const [y,m]=ym.split('-').map(Number);
+  const d=new Date(y,m,1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+async function loadBudgetMonths(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/budget_entries?select=month&order=month.asc`,{
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    if(res.ok){
+      const data=await res.json();
+      return [...new Set(data.map(r=>r.month))];
+    }
+  }catch(e){}
+  return [];
+}
+
+async function ensureBudgetMonth(ym){
+  try{
+    const check=await fetch(`${SUPABASE_URL}/rest/v1/budget_entries?month=eq.${ym}&limit=1`,{
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    const existing=await check.json();
+    if(existing&&existing.length>0)return;
+  }catch(e){}
+
+  const months=await loadBudgetMonths();
+  const prior=months.filter(m=>m<ym).sort().pop();
+  let rows=[];
+  if(prior){
+    try{
+      const res=await fetch(`${SUPABASE_URL}/rest/v1/budget_entries?month=eq.${prior}`,{
+        headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+      });
+      const priorRows=res.ok?await res.json():[];
+      rows=priorRows.map(r=>({
+        id:genId(), month:ym, type:r.type, category:r.category, item:r.item,
+        budget:r.budget, actual:null, card:r.card, note:r.note, updated_at:new Date().toISOString()
+      }));
+    }catch(e){}
+  }
+  if(!rows.length){
+    Object.keys(BUDGET_DEFAULT_ITEMS).forEach(type=>{
+      BUDGET_DEFAULT_ITEMS[type].forEach(([category,item,budget,card,note])=>{
+        rows.push({id:genId(), month:ym, type, category, item, budget, actual:null, card, note, updated_at:new Date().toISOString()});
+      });
+    });
+  }
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/budget_entries`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify(rows)
+    });
+  }catch(e){showToast('⚠️ 새 달 생성 실패',true);}
+}
+
+async function loadBudgetEntries(ym){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/budget_entries?month=eq.${ym}&order=category.asc`,{
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+    if(res.ok) return await res.json();
+  }catch(e){}
+  return [];
+}
+
+async function onBudgetActualChange(id,val){
+  const num=val===''?null:Number(val);
+  const entry=budgetEntries.find(r=>r.id===id);
+  if(entry)entry.actual=num;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/budget_entries?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify({actual:num,updated_at:new Date().toISOString()})
+    });
+    showToast('✅ 저장됨');
+  }catch(e){showToast('⚠️ 저장 실패',true);}
+  renderBudgetTab();
+}
+
+function setBudgetType(t){
+  budgetType=t;
+  renderBudgetTab();
+}
+
+async function selectBudgetMonth(ym){
+  budgetMonth=ym;
+  await ensureBudgetMonth(ym);
+  budgetEntries=await loadBudgetEntries(ym);
+  renderBudgetTab();
+}
+
+async function newBudgetMonth(){
+  const sel=document.getElementById('budget-month-select');
+  const options=Array.from(sel.options).map(o=>o.value);
+  const latest=options.sort().pop()||budgetYmNow();
+  const ym=budgetNextYm(latest);
+  await ensureBudgetMonth(ym);
+  const opt=document.createElement('option');
+  opt.value=ym; opt.textContent=budgetYmLabel(ym);
+  sel.appendChild(opt);
+  sel.value=ym;
+  selectBudgetMonth(ym);
+}
+
+async function initBudgetTab(){
+  const c=document.getElementById('budget-content');
+  if(!c)return;
+  if(budgetMonth){ renderBudgetTab(); return; }
+  c.innerHTML='<div class="empty-state"><div class="empty-icon">💰</div><div class="empty-text">불러오는 중...</div></div>';
+  let months=await loadBudgetMonths();
+  const cur=budgetYmNow();
+  if(!months.includes(cur))months.push(cur);
+  months=[...new Set(months)].sort();
+  const ym=months[months.length-1];
+  await selectBudgetMonth(ym);
+}
+
+function renderBudgetTab(){
+  const c=document.getElementById('budget-content');
+  if(!c)return;
+
+  const rows=budgetEntries.filter(r=>r.type===budgetType);
+  const byCat={};
+  rows.forEach(r=>{ (byCat[r.category]=byCat[r.category]||[]).push(r); });
+
+  let grandBudget=0, grandActual=0;
+  let catHtml='';
+  Object.keys(byCat).forEach(cat=>{
+    catHtml+=`<div class="budget-cat-title">${cat}</div>`;
+    let subB=0, subA=0;
+    byCat[cat].forEach(r=>{
+      subB+=Number(r.budget||0);
+      subA+=Number(r.actual||0);
+      const diff=Number(r.budget||0)-Number(r.actual||0);
+      const diffClass=r.actual==null?'':(diff<0?'over':'good');
+      catHtml+=`<div class="budget-item-row">
+        <div class="budget-item-name">${esc(r.item)}</div>
+        <div class="budget-item-budget">${budgetWon(r.budget)}</div>
+        <div class="budget-item-actual"><input type="number" inputmode="numeric" value="${r.actual==null?'':r.actual}" onchange="onBudgetActualChange('${r.id}',this.value)"></div>
+        <div class="budget-item-diff ${diffClass}">${r.actual==null?'-':budgetWon(diff)}</div>
+      </div>`;
+    });
+    grandBudget+=subB; grandActual+=subA;
+    const subDiff=subB-subA;
+    catHtml+=`<div class="budget-subtotal-row">
+      <div class="budget-item-name">${cat} 합계</div>
+      <div class="budget-item-budget">${budgetWon(subB)}</div>
+      <div class="budget-item-actual">${budgetWon(subA)}</div>
+      <div class="budget-item-diff ${subDiff<0?'over':'good'}">${budgetWon(subDiff)}</div>
+    </div>`;
+  });
+
+  const grandDiff=grandBudget-grandActual;
+
+  const cardMap={};
+  budgetEntries.forEach(r=>{
+    const k=r.card||'미지정';
+    cardMap[k]=cardMap[k]||{budget:0,actual:0};
+    cardMap[k].budget+=Number(r.budget||0);
+    cardMap[k].actual+=Number(r.actual||0);
+  });
+  const cardRows=Object.keys(cardMap).sort((a,b)=>cardMap[b].budget-cardMap[a].budget).map(card=>{
+    const {budget,actual}=cardMap[card];
+    const diff=budget-actual;
+    return`<div class="budget-card-row"><span>${esc(card)}</span><span style="color:${diff<0?'var(--danger)':'var(--accent)'}">${budgetWon(actual)} / ${budgetWon(budget)}</span></div>`;
+  }).join('');
+
+  c.innerHTML=`
+    <div class="budget-controls">
+      <select id="budget-month-select" onchange="selectBudgetMonth(this.value)"></select>
+      <button class="btn-sm" onclick="newBudgetMonth()">+ 새 달 시작</button>
+    </div>
+    <div class="pipeline-select-row">
+      <button class="pipeline-select-btn ${budgetType==='가계'?'on':''}" style="${budgetType==='가계'?'background:var(--purple);':''}" onclick="setBudgetType('가계')">가계</button>
+      <button class="pipeline-select-btn ${budgetType==='슈가펫'?'on':''}" style="${budgetType==='슈가펫'?'background:var(--purple);':''}" onclick="setBudgetType('슈가펫')">슈가펫</button>
+    </div>
+    <div class="budget-summary">
+      <div class="stats-card"><div class="stats-card-lbl">예산</div><div class="stats-card-val">${budgetWon(grandBudget)}</div></div>
+      <div class="stats-card"><div class="stats-card-lbl">실제지출</div><div class="stats-card-val">${budgetWon(grandActual)}</div></div>
+      <div class="stats-card"><div class="stats-card-lbl">차액</div><div class="stats-card-val" style="color:${grandDiff<0?'var(--danger)':'var(--accent)'}">${budgetWon(grandDiff)}</div></div>
+    </div>
+    ${rows.length?catHtml:`<div class="empty-state"><div class="empty-icon">💰</div><div class="empty-text">이 달 데이터가 없어요.</div></div>`}
+    ${rows.length?`<div class="budget-grandtotal">
+      <div class="budget-item-name">${budgetType} 총합</div>
+      <div class="budget-item-budget">${budgetWon(grandBudget)}</div>
+      <div class="budget-item-actual">${budgetWon(grandActual)}</div>
+      <div class="budget-item-diff">${budgetWon(grandDiff)}</div>
+    </div>`:''}
+    <div class="chart-box" style="margin-top:16px;">
+      <div class="chart-title">💳 카드별 실적 (이번 달, 가계+슈가펫)</div>
+      ${cardRows||'<div style="font-size:12px;color:var(--text3);">데이터 없음</div>'}
+    </div>
+  `;
+
+  // populate month select without losing current selection
+  loadBudgetMonths().then(months=>{
+    const cur=budgetYmNow();
+    if(!months.includes(cur))months.push(cur);
+    if(budgetMonth&&!months.includes(budgetMonth))months.push(budgetMonth);
+    months=[...new Set(months)].sort();
+    const sel=document.getElementById('budget-month-select');
+    if(!sel)return;
+    sel.innerHTML=months.map(m=>`<option value="${m}">${budgetYmLabel(m)}</option>`).join('');
+    sel.value=budgetMonth;
+  });
+}
+
 async function initApp(){
   loadLocal();
   initDietSelects();
@@ -1771,13 +2081,14 @@ function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g
 function showTab(tab,el){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));
   el.classList.add('on');
-  ['diary','timer','tasks','reading','stats','settings'].forEach(t=>{
+  ['diary','timer','tasks','reading','budget','stats','settings'].forEach(t=>{
     document.getElementById('main-'+t).style.display=t===tab?'':'none';
   });
   document.getElementById('fab-btn').style.display=tab==='diary'?'':'none';
   if(tab==='timer') renderTimerTab();
   if(tab==='tasks') renderTasksTab();
   if(tab==='reading') renderReadingTab();
+  if(tab==='budget') initBudgetTab();
   if(tab==='stats') renderStats();
   if(tab==='settings') renderSettings();
 }
