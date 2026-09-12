@@ -1827,7 +1827,8 @@ const BUDGET_DEFAULT_ITEMS={
     ["고정비","키오스크 사용료",86900,"삼성BIZ카드(슈가펫)",""],
     ["고정비","매장 인터넷",22000,"삼성BIZ카드(슈가펫)",""],
     ["고정비","매장 CCTV",5500,"삼성BIZ카드(슈가펫)",""],
-  ]
+  ],
+  "영업비":[]
 };
 
 let budgetMonth=null;
@@ -1981,6 +1982,54 @@ async function initBudgetTab(){
   await selectBudgetMonth(ym);
 }
 
+async function addBudgetItem(){
+  if(!budgetMonth)return;
+  const category=(document.getElementById('budget-new-cat')?.value||'').trim();
+  const item=(document.getElementById('budget-new-item')?.value||'').trim();
+  const amount=Number(document.getElementById('budget-new-amount')?.value||0);
+  const card=(document.getElementById('budget-new-card')?.value||'').trim();
+  if(!category||!item){showToast('분류와 항목명을 입력해주세요',true);return;}
+  const row={
+    id:genId(), month:budgetMonth, type:budgetType, category, item,
+    budget:0, actual:amount||null, card, note:'', updated_at:new Date().toISOString()
+  };
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/budget_entries`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify([row])
+    });
+    if(!res.ok){
+      const errText=await res.text().catch(()=>'');
+      showErrorBanner('항목 추가 실패 ('+res.status+'): '+errText);
+      showToast('⚠️ 추가 실패',true);
+      return;
+    }
+    showToast('✅ 항목 추가됨');
+    budgetEntries.push(row);
+    document.getElementById('budget-new-cat').value='';
+    document.getElementById('budget-new-item').value='';
+    document.getElementById('budget-new-amount').value='';
+    document.getElementById('budget-new-card').value='';
+    renderBudgetTab();
+  }catch(e){
+    showErrorBanner('항목 추가 오류: '+e.message);
+    showToast('⚠️ 추가 실패',true);
+  }
+}
+
+async function deleteBudgetItem(id){
+  if(!confirm('이 항목을 삭제할까요?'))return;
+  budgetEntries=budgetEntries.filter(r=>r.id!==id);
+  renderBudgetTab();
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/budget_entries?id=eq.${id}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
+    });
+  }catch(e){}
+}
+
 function renderBudgetTab(){
   const c=document.getElementById('budget-content');
   if(!c)return;
@@ -2029,6 +2078,7 @@ function renderBudgetTab(){
         <div class="budget-item-budget">${budgetWon(r.budget)}</div>
         <div class="budget-item-actual"><input type="number" inputmode="numeric" value="${r.actual==null?'':r.actual}" onchange="onBudgetActualChange('${r.id}',this.value)"></div>
         <div class="budget-item-diff ${diffClass}">${r.actual==null?'-':budgetWon(diff)}</div>
+        <button onclick="deleteBudgetItem('${r.id}')" style="border:none;background:none;color:var(--text3);font-size:15px;cursor:pointer;padding:2px 2px;flex-shrink:0;">×</button>
       </div>`;
     });
     grandBudget+=subB; grandActual+=subA;
@@ -2064,6 +2114,7 @@ function renderBudgetTab(){
     <div class="pipeline-select-row">
       <button class="pipeline-select-btn ${budgetType==='가계'?'on':''}" style="${budgetType==='가계'?'background:var(--purple);':''}" onclick="setBudgetType('가계')">가계</button>
       <button class="pipeline-select-btn ${budgetType==='슈가펫'?'on':''}" style="${budgetType==='슈가펫'?'background:var(--purple);':''}" onclick="setBudgetType('슈가펫')">슈가펫</button>
+      <button class="pipeline-select-btn ${budgetType==='영업비'?'on':''}" style="${budgetType==='영업비'?'background:var(--purple);':''}" onclick="setBudgetType('영업비')">영업비</button>
     </div>
     <div class="budget-summary">
       <div class="stats-card"><div class="stats-card-lbl">예산</div><div class="stats-card-val">${budgetWon(grandBudget)}</div></div>
@@ -2077,8 +2128,21 @@ function renderBudgetTab(){
       <div class="budget-item-actual">${budgetWon(grandActual)}</div>
       <div class="budget-item-diff">${budgetWon(grandDiff)}</div>
     </div>`:''}
+    <div class="setting-card" style="margin-top:16px;">
+      <div class="setting-title">+ 새 항목 추가 (${budgetType})</div>
+      <div class="setting-note">애터미/보험 영업비처럼 매달 금액이 다른 지출은 여기서 그때그때 추가하세요.</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <input id="budget-new-cat" type="text" placeholder="분류 (예: 애터미)" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+        <input id="budget-new-item" type="text" placeholder="항목명 (예: 고객 커피값)" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+      </div>
+      <div style="display:flex;gap:6px;">
+        <input id="budget-new-amount" type="number" inputmode="numeric" placeholder="금액" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+        <input id="budget-new-card" type="text" placeholder="결제수단(선택)" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);">
+        <button onclick="addBudgetItem()" style="padding:8px 14px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">추가</button>
+      </div>
+    </div>
     <div class="chart-box" style="margin-top:16px;">
-      <div class="chart-title">💳 카드별 실적 (이번 달, 가계+슈가펫)</div>
+      <div class="chart-title">💳 카드별 실적 (이번 달, 가계+슈가펫+영업비)</div>
       ${cardRows||'<div style="font-size:12px;color:var(--text3);">데이터 없음</div>'}
     </div>
   `;
