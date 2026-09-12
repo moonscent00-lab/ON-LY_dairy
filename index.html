@@ -1861,9 +1861,19 @@ async function ensureBudgetMonth(ym){
     const check=await fetch(`${SUPABASE_URL}/rest/v1/budget_entries?month=eq.${ym}&limit=1`,{
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
     });
+    if(!check.ok){
+      const errText=await check.text().catch(()=>'');
+      showErrorBanner('budget_entries 조회 실패 ('+check.status+'): '+errText);
+      showToast('⚠️ budget_entries 조회 실패 ('+check.status+')',true);
+      return;
+    }
     const existing=await check.json();
     if(existing&&existing.length>0)return;
-  }catch(e){}
+  }catch(e){
+    showErrorBanner('budget_entries 조회 오류: '+e.message);
+    showToast('⚠️ budget_entries 테이블에 연결 못했어요',true);
+    return;
+  }
 
   const months=await loadBudgetMonths();
   const prior=months.filter(m=>m<ym).sort().pop();
@@ -1888,12 +1898,20 @@ async function ensureBudgetMonth(ym){
     });
   }
   try{
-    await fetch(`${SUPABASE_URL}/rest/v1/budget_entries`,{
+    const insRes=await fetch(`${SUPABASE_URL}/rest/v1/budget_entries`,{
       method:'POST',
-      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
       body:JSON.stringify(rows)
     });
-  }catch(e){showToast('⚠️ 새 달 생성 실패',true);}
+    if(!insRes.ok){
+      const errText=await insRes.text().catch(()=>'');
+      showErrorBanner('새 달 생성 실패 ('+insRes.status+'): '+errText);
+      showToast('⚠️ 새 달 생성 실패 ('+insRes.status+')',true);
+    }
+  }catch(e){
+    showErrorBanner('새 달 생성 오류: '+e.message);
+    showToast('⚠️ 새 달 생성 실패',true);
+  }
 }
 
 async function loadBudgetEntries(ym){
@@ -1902,7 +1920,11 @@ async function loadBudgetEntries(ym){
       headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`}
     });
     if(res.ok) return await res.json();
-  }catch(e){}
+    const errText=await res.text().catch(()=>'');
+    showErrorBanner('budget_entries 불러오기 실패 ('+res.status+'): '+errText);
+  }catch(e){
+    showErrorBanner('budget_entries 불러오기 오류: '+e.message);
+  }
   return [];
 }
 
@@ -1967,12 +1989,37 @@ function renderBudgetTab(){
   const byCat={};
   rows.forEach(r=>{ (byCat[r.category]=byCat[r.category]||[]).push(r); });
 
+  // 카테고리를 기본 정의 순서대로 정렬 (①②③...처럼 특수문자는 DB 정렬이 못 믿음직해서 직접 순서 부여)
+  const categoryOrder=[];
+  Object.values(BUDGET_DEFAULT_ITEMS).forEach(items=>{
+    items.forEach(([cat])=>{ if(!categoryOrder.includes(cat)) categoryOrder.push(cat); });
+  });
+  const catKeys=Object.keys(byCat).sort((a,b)=>{
+    const ia=categoryOrder.indexOf(a), ib=categoryOrder.indexOf(b);
+    if(ia===-1&&ib===-1) return a.localeCompare(b);
+    if(ia===-1) return 1;
+    if(ib===-1) return -1;
+    return ia-ib;
+  });
+
+  const itemOrder=[];
+  Object.values(BUDGET_DEFAULT_ITEMS).forEach(items=>{
+    items.forEach(([cat,item])=>{ itemOrder.push(cat+'|'+item); });
+  });
+  function itemSort(a,b){
+    const ia=itemOrder.indexOf(a.category+'|'+a.item), ib=itemOrder.indexOf(b.category+'|'+b.item);
+    if(ia===-1&&ib===-1) return 0;
+    if(ia===-1) return 1;
+    if(ib===-1) return -1;
+    return ia-ib;
+  }
+
   let grandBudget=0, grandActual=0;
   let catHtml='';
-  Object.keys(byCat).forEach(cat=>{
+  catKeys.forEach(cat=>{
     catHtml+=`<div class="budget-cat-title">${cat}</div>`;
     let subB=0, subA=0;
-    byCat[cat].forEach(r=>{
+    byCat[cat].sort(itemSort).forEach(r=>{
       subB+=Number(r.budget||0);
       subA+=Number(r.actual||0);
       const diff=Number(r.budget||0)-Number(r.actual||0);
